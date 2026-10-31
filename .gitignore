@@ -1,0 +1,15 @@
+# ── 绝对不能公开 ──
+# 60_state 里有 B 站登录态备份（browser-profile 复制），泄露=账号被盗
+60_state/
+# raw/ 是 B 站视频字幕原文，只允许本地留档，不发布（版权边界）
+10_sources/
+
+# ── 本地产物 / 日志 ──
+50_logs/
+site/_preview/
+__pycache__/
+*.pyc
+
+# ── 编辑器 ──
+.vscode/
+.idea/

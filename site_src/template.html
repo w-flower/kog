@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>王者荣耀实战知识库 · {{VERSION}}</title>
+<meta name="description" content="按英雄教学 / 克制关系 / BP / 对局内四类组织的王者荣耀决策手册，每条结论可回溯到视频时间戳。">
+<meta name="color-scheme" content="dark light">
+<style>
+{{CSS}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside id="side">
+    <div class="brand"><b>王者荣耀实战知识库</b><span class="tag">{{VERSION}}</span></div>
+    <p class="sub" id="subline"></p>
+
+    <div class="search">
+      <svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4-3.3-3.3zM6.5 10a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+      <input id="q" type="search" placeholder="搜索条目 / 关键词…" autocomplete="off">
+    </div>
+    <div class="hint">按 <code>/</code> 聚焦，<code>Esc</code> 清空</div>
+    <div class="results" id="res"></div>
+
+    <nav id="nav"></nav>
+  </aside>
+
+  <main>
+    <div class="top">
+      <button class="icobtn" id="menu" aria-label="菜单">☰</button>
+      <span class="crumb" id="crumb">总览</span>
+      <span class="sp"></span>
+      <button class="icobtn" id="theme" aria-label="切换主题">◐</button>
+    </div>
+    <div id="view"></div>
+    <footer id="foot"></footer>
+  </main>
+</div>
+<button class="icobtn" id="backtop" aria-label="回到顶部">↑</button>
+<div id="mask"></div>
+
+<script type="application/json" id="DATA">{{DATA}}</script>
+<script>
+{{JS}}
+</script>
+</body>
+</html>
