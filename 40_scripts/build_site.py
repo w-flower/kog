@@ -156,6 +156,29 @@ def split_doc(path: Path) -> tuple[str, str, list[dict]]:
     return title, intro, entries
 
 
+def first_sentence(html_text: str, limit: int = 96) -> str:
+    """从条目正文里抽一句摘要，卡片上只显示这一句。"""
+    m = re.search(r"<p>(.*?)</p>", html_text, re.S)
+    raw = m.group(1) if m else html_text
+    raw = re.sub(r"<[^>]+>", "", raw).strip()
+    raw = raw.replace("\n", "")
+    raw = re.split(r"(?<=[。！？；])", raw)[0] if raw else ""
+    return raw[:limit] + ("…" if len(raw) > limit else "")
+
+
+def hue_of(name: str) -> int:
+    """英雄图标色相：同名恒定，不同英雄自动分开。"""
+    h = 0
+    for ch in name:
+        h = (h * 131 + ord(ch)) % 360
+    return (h * 7 + 190) % 360
+
+
+def parse_opp(title: str) -> str:
+    m = re.search(r"^对([\u4e00-\u9fa5]{2,4})[：:]", title)
+    return m.group(1) if m else ""
+
+
 def collect() -> dict:
     cats = []
     for key, name, dname, desc in CAT_META:
@@ -172,8 +195,43 @@ def collect() -> dict:
             if f.name.startswith("_"):
                 continue
             title, intro, entries = split_doc(f)
-            docs.append({"title": title, "file": f.name, "intro": intro, "entries": entries})
+            for e in entries:
+                e["sum"] = first_sentence(e["html"])
+            docs.append({"title": title, "file": f.name, "intro": intro,
+                         "entries": entries, "hero": f.stem})
         cats.append({"key": key, "name": name, "desc": desc, "about": about, "docs": docs})
+
+    # ── 按英雄归拢：A 文档 / B 文档的文件名就是英雄名
+    heroes: dict[str, dict] = {}
+    general: list[dict] = []
+    for c in cats:
+        for d in c["docs"]:
+            if c["key"] in ("A", "B"):
+                h = heroes.setdefault(d["hero"], {
+                    "name": d["hero"], "hue": hue_of(d["hero"]), "a": [], "b": []})
+                slot = "a" if c["key"] == "A" else "b"
+                for e in d["entries"]:
+                    if slot == "b":
+                        e["opp"] = parse_opp(e["title"])
+                    h[slot].append(e)
+            else:
+                general.append({"key": c["key"], "cat": c["name"], "title": d["title"],
+                                "file": d["file"], "intro": d["intro"],
+                                "entries": d["entries"]})
+
+    hero_list = []
+    for h in heroes.values():
+        h["n"] = len(h["a"]) + len(h["b"])
+        h["b_n"] = len(h["b"])
+        # 被谁打：从所有 B 条目里反查对手是不是他
+        h["vs"] = sorted({e["opp"] for e in h["b"] if e.get("opp")})
+        hero_list.append(h)
+    hero_list.sort(key=lambda x: (-x["n"], x["name"]))
+
+    # 反向索引：这个英雄在谁的 B 条目里被点名
+    for h in hero_list:
+        h["incoming"] = [x["name"] for x in hero_list
+                         if h["name"] in x["vs"] and x["name"] != h["name"]]
 
     overview = []
     for f in ["00_导航.md", "95_信源名单.md", "90_版本变更台账.md"]:
@@ -181,7 +239,11 @@ def collect() -> dict:
         if p.exists():
             title, intro, _ = split_doc(p)
             overview.append({"title": title, "file": f, "html": intro})
-    return {"cats": cats, "overview": overview}
+
+    return {"version": VERSION, "heroes": hero_list, "general": general,
+            "cats": [{"key": c["key"], "name": c["name"], "desc": c["desc"],
+                      "n": sum(len(d["entries"]) for d in c["docs"])} for c in cats],
+            "overview": overview}
 
 
 def compose(data: dict) -> str:
@@ -210,13 +272,12 @@ def main() -> int:
             return 2
 
     data = collect()
-    total = sum(len(d["entries"]) for c in data["cats"] for d in c["docs"])
+    total = sum(c["n"] for c in data["cats"])
     today = datetime.now().strftime("%Y-%m-%d")
     data["meta"] = {
+        "total": total,
+        "heroes": len(data["heroes"]),
         "sub": f"当前版本 {VERSION} · 共 {total} 条 · 更新 {today}",
-        "foot": ("每条的「来源」都可回溯到 B 站视频的具体时间戳；无来源不写结论。<br>"
-                 "内容改 <code>20_kb/*.md</code>，样式改 <code>site_src/app.css</code>，"
-                 "交互改 <code>site_src/app.js</code>，然后重跑 <code>build_site.py</code>。"),
     }
 
     out_html = compose(data)

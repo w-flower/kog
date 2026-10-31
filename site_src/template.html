@@ -4,41 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>王者荣耀实战知识库 · {{VERSION}}</title>
-<meta name="description" content="按英雄教学 / 克制关系 / BP / 对局内四类组织的王者荣耀决策手册，每条结论可回溯到视频时间戳。">
+<meta name="description" content="按英雄查的王者荣耀决策手册：怎么玩、打谁舒服、被谁克、这一刻该干什么。">
 <meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0f1115">
 <style>
 {{CSS}}
 </style>
 </head>
 <body>
-<div class="layout">
-  <aside id="side">
-    <div class="brand"><b>王者荣耀实战知识库</b><span class="tag">{{VERSION}}</span></div>
-    <p class="sub" id="subline"></p>
+<header class="top">
+  <a class="brand" href="#">
+    <span class="logo">王</span>
+    <span class="bt"><b>实战知识库</b><i>{{VERSION}}</i></span>
+  </a>
+  <label class="search">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4-3.3-3.3zM6.5 10a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+    <input id="q" type="search" placeholder="搜英雄或关键词" autocomplete="off">
+  </label>
+  <button id="theme" class="icon-btn" aria-label="切换主题">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 3.2v2.1M12 18.7v2.1M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M3.2 12h2.1M18.7 12h2.1M5.8 18.2l1.5-1.5M16.7 7.3l1.5-1.5"/></svg>
+  </button>
+</header>
 
-    <div class="search">
-      <svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4-3.3-3.3zM6.5 10a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
-      <input id="q" type="search" placeholder="搜索条目 / 关键词…" autocomplete="off">
-    </div>
-    <div class="hint">按 <code>/</code> 聚焦，<code>Esc</code> 清空</div>
-    <div class="results" id="res"></div>
+<main id="view" class="wrap"></main>
 
-    <nav id="nav"></nav>
-  </aside>
-
-  <main>
-    <div class="top">
-      <button class="icobtn" id="menu" aria-label="菜单">☰</button>
-      <span class="crumb" id="crumb">总览</span>
-      <span class="sp"></span>
-      <button class="icobtn" id="theme" aria-label="切换主题">◐</button>
-    </div>
-    <div id="view"></div>
-    <footer id="foot"></footer>
-  </main>
-</div>
-<button class="icobtn" id="backtop" aria-label="回到顶部">↑</button>
-<div id="mask"></div>
+<footer class="foot">
+  <span>改内容 → <code>20_kb/*.md</code> ｜ 改样式 → <code>site_src/app.css</code> ｜ 然后重跑 <code>build_site.py</code></span>
+</footer>
 
 <script type="application/json" id="DATA">{{DATA}}</script>
 <script>

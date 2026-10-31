@@ -4,389 +4,546 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>王者荣耀实战知识库 · S45</title>
-<meta name="description" content="按英雄教学 / 克制关系 / BP / 对局内四类组织的王者荣耀决策手册，每条结论可回溯到视频时间戳。">
+<meta name="description" content="按英雄查的王者荣耀决策手册：怎么玩、打谁舒服、被谁克、这一刻该干什么。">
 <meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0f1115">
 <style>
 /* ══════════════════════════════════════════════════════════
-   kog 站点样式
-   主题：:root 是深色，html[data-theme="light"] 覆盖成浅色
-   改配色只改这里的变量，不要动下面的组件规则
+   kog 站点样式 —— 英雄宫格 + 折叠卡
+   改配色只改 :root 变量；组件规则一般不用动
    ══════════════════════════════════════════════════════════ */
 :root{
-  --bg:#0e1116; --bg2:#151a21; --bg3:#1b222b; --line:#262f3a;
-  --fg:#e6edf3; --fg2:#9aa7b4; --fg3:#6b7785;
-  --accent:#f0b429; --accent2:#2f81f7; --ok:#3fb950; --warn:#d29922; --bad:#f85149;
-  --radius:10px; --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Consolas,monospace;
+  --bg:#0e1116; --bg2:#151a21; --bg3:#1c232d; --line:#28313d; --line2:#333e4c;
+  --fg:#e8eef5; --fg2:#98a5b3; --fg3:#6d7887;
+  --accent:#f0b429; --accent2:#5aa2ff; --ok:#3fb950; --bad:#f85149;
+  --r:16px; --r-s:11px;
   --sans:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Consolas,monospace;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
 }
 html[data-theme="light"]{
-  --bg:#fbfbfa; --bg2:#ffffff; --bg3:#f3f4f6; --line:#e3e6ea;
-  --fg:#1a1f26; --fg2:#55606b; --fg3:#8b95a1;
-  --accent:#b57d00; --accent2:#0a63c9;
+  --bg:#f7f8fa; --bg2:#ffffff; --bg3:#eef1f5; --line:#e2e7ee; --line2:#cfd7e2;
+  --fg:#161b22; --fg2:#5a6672; --fg3:#8b98a6;
+  --accent:#b57d00; --accent2:#1266d6;
+  --shadow:0 1px 2px rgba(16,24,40,.06), 0 10px 24px -14px rgba(16,24,40,.18);
 }
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
   background:var(--bg); color:var(--fg); font-family:var(--sans);
-  font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;
+  font-size:15.5px; line-height:1.85; -webkit-font-smoothing:antialiased;
+  padding-bottom:40px;
 }
 a{color:var(--accent2); text-decoration:none}
 a:hover{text-decoration:underline}
+code{
+  font-family:var(--mono); font-size:.88em; padding:.1em .38em; border-radius:5px;
+  background:var(--bg3); border:1px solid var(--line);
+}
 
-.layout{display:grid; grid-template-columns:288px minmax(0,1fr); min-height:100dvh}
-
-/* ─────────── 侧栏 ─────────── */
-aside{
-  background:var(--bg2); border-right:1px solid var(--line);
-  position:sticky; top:0; height:100dvh; overflow-y:auto; padding:18px 14px 40px;
-}
-.brand{display:flex; align-items:baseline; gap:8px; margin:2px 4px 4px}
-.brand b{font-size:16px; letter-spacing:.3px}
-.tag{
-  font:600 11px/1 var(--sans); padding:3px 6px; border-radius:5px;
-  background:color-mix(in srgb,var(--accent) 18%,transparent); color:var(--accent);
-  border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);
-}
-.sub{color:var(--fg3); font-size:12px; margin:0 4px 14px}
-
-.search{position:relative; margin-bottom:14px}
-.search input{
-  width:100%; padding:9px 11px 9px 30px; border-radius:8px; border:1px solid var(--line);
-  background:var(--bg3); color:var(--fg); font-size:13px; font-family:var(--sans); outline:none;
-}
-.search input:focus{border-color:var(--accent2); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent2) 22%,transparent)}
-.search svg{position:absolute; left:9px; top:10px; width:14px; height:14px; fill:var(--fg3)}
-.hint{font-size:11px; color:var(--fg3); margin:-8px 4px 12px}
-.results{margin:0 0 12px; display:none}
-.results.on{display:block}
-.results a{
-  display:block; padding:7px 9px; border-radius:7px; font-size:13px; color:var(--fg);
-  border:1px solid transparent;
-}
-.results a:hover{background:var(--bg3); text-decoration:none}
-.results a .m{color:var(--fg3); font-size:11px; font-family:var(--mono); margin-right:5px}
-
-nav .grp{margin-bottom:6px}
-nav .gh{
-  display:flex; align-items:center; gap:7px; width:100%; text-align:left;
-  background:none; border:0; color:var(--fg2); font:600 12px/1 var(--sans);
-  padding:9px 6px; cursor:pointer; border-radius:7px; letter-spacing:.6px;
-}
-nav .gh:hover{background:var(--bg3); color:var(--fg)}
-nav .gh .k{
-  width:18px; height:18px; border-radius:5px; display:grid; place-items:center;
-  font:700 10px/1 var(--sans); color:#0d1117; background:var(--accent);
-}
-nav .gh .n{margin-left:auto; color:var(--fg3); font-weight:400; font-family:var(--mono)}
-nav ul{list-style:none; margin:0 0 8px; padding:0 0 0 6px}
-nav li a{
-  display:block; padding:6px 9px; border-radius:6px; font-size:13.5px; color:var(--fg2);
-  border-left:2px solid transparent;
-}
-nav li a:hover{background:var(--bg3); color:var(--fg); text-decoration:none}
-nav li a.on{color:var(--accent); border-left-color:var(--accent); background:color-mix(in srgb,var(--accent) 9%,transparent)}
-nav li a code{font-family:var(--mono); font-size:11px; color:var(--fg3); margin-right:5px}
-nav li.sub-item a{padding-left:20px; font-size:12.5px; color:var(--fg3)}
-
-/* ─────────── 主区 ─────────── */
-main{padding:0 0 96px; min-width:0}
+/* ─────────── 顶栏 ─────────── */
 .top{
-  position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:10px;
-  padding:12px 28px; background:color-mix(in srgb,var(--bg) 88%,transparent);
-  backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:14px;
+  padding:12px clamp(16px,4vw,32px); background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(14px); border-bottom:1px solid var(--line);
 }
-.crumb{font-size:12.5px; color:var(--fg3); font-family:var(--mono)}
-.top .sp{flex:1}
-.icobtn{
-  border:1px solid var(--line); background:var(--bg2); color:var(--fg2);
-  width:32px; height:32px; border-radius:8px; cursor:pointer; display:grid; place-items:center;
-  font-size:14px;
+.brand{display:flex; align-items:center; gap:10px; color:var(--fg); flex:none}
+.brand:hover{text-decoration:none}
+.logo{
+  width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+  font-weight:800;font-size:16px;color:#12161c;
+  background:linear-gradient(145deg,#ffd76a,#e8a01c);
 }
-.icobtn:hover{color:var(--fg); border-color:var(--fg3)}
-#menu{display:none}
+.bt{display:flex;align-items:baseline;gap:7px;font-size:15px;letter-spacing:.2px}
+.bt b{font-weight:700}
+.bt i{font-style:normal;font-size:11.5px;color:var(--fg3);border:1px solid var(--line2);
+  padding:1px 6px;border-radius:20px}
+.search{
+  flex:1; display:flex; align-items:center; gap:8px; max-width:520px;
+  background:var(--bg2); border:1px solid var(--line); border-radius:12px;
+  padding:0 12px; height:42px; transition:border-color .15s;
+}
+.search:focus-within{border-color:var(--accent2)}
+.search svg{width:15px;height:15px;fill:var(--fg3);flex:none}
+.search input{
+  flex:1;border:0;outline:0;background:transparent;color:var(--fg);
+  font:inherit;font-size:14.5px;
+}
+.icon-btn{
+  flex:none;width:42px;height:42px;display:grid;place-items:center;cursor:pointer;
+  background:var(--bg2);border:1px solid var(--line);border-radius:12px;color:var(--fg2);
+}
+.icon-btn:hover{color:var(--fg);border-color:var(--line2)}
+.icon-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round}
 
-.doc{padding:26px 28px 0; max-width:900px}
-.doc h1{font-size:26px; line-height:1.35; margin:.2em 0 .5em; letter-spacing:-.3px}
-.doc h2{
-  font-size:18px; margin:1.9em 0 .7em; border-top:1px solid var(--line); padding-top:16px;
+/* ─────────── 版心 ─────────── */
+.wrap{max-width:1080px;margin:0 auto;padding:clamp(26px,4vw,46px) clamp(16px,4vw,32px)}
+
+.hero-head{margin:0 0 26px}
+.eyebrow{font-size:12.5px;color:var(--fg3);letter-spacing:.14em;text-transform:uppercase;margin:0 0 8px}
+h1{font-size:clamp(25px,4.2vw,34px);line-height:1.3;margin:0 0 10px;letter-spacing:-.4px}
+.lede{color:var(--fg2);margin:0;max-width:56ch;font-size:15px;line-height:1.8}
+
+.sec{margin:0 0 34px}
+.sec-h{display:flex;align-items:baseline;gap:10px;margin:0 0 14px}
+.sec-h h2{font-size:16px;margin:0;letter-spacing:.3px}
+.sec-h span{font-size:12.5px;color:var(--fg3)}
+
+/* ─────────── 英雄宫格 ─────────── */
+.grid{
+  display:grid; gap:12px;
+  grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
 }
-.doc h3{font-size:16px; margin:1.6em 0 .5em}
-.doc h4{font-size:14.5px; margin:1.3em 0 .4em; color:var(--fg2)}
-.doc p{margin:.7em 0}
-.doc ul,.doc ol{margin:.6em 0; padding-left:1.35em}
-.doc li{margin:.28em 0}
-.doc code{
-  font-family:var(--mono); font-size:.88em; background:var(--bg3);
-  padding:1.5px 5px; border-radius:4px; border:1px solid var(--line);
+.hcard{
+  position:relative; display:flex; flex-direction:column; gap:10px; padding:16px 14px 14px;
+  background:var(--bg2); border:1px solid var(--line); border-radius:var(--r);
+  color:var(--fg); box-shadow:var(--shadow);
+  transition:transform .16s ease, border-color .16s ease;
 }
-.doc pre{
-  background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius);
-  padding:14px 16px; overflow-x:auto; margin:1em 0; line-height:1.55;
+.hcard:hover{text-decoration:none;transform:translateY(-3px);border-color:var(--line2)}
+.avatar{
+  width:50px;height:50px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font-weight:800;font-size:20px;letter-spacing:0;
+  color:hsl(var(--h) 85% 80%);
+  background:
+    radial-gradient(circle at 32% 26%, hsl(var(--h) 60% 34%), hsl(var(--h) 70% 15%));
+  border:1px solid hsl(var(--h) 55% 42% / .55);
+  box-shadow:inset 0 0 14px hsl(var(--h) 80% 40% / .28);
 }
-.doc pre code{background:none; border:0; padding:0; font-size:12.5px; color:var(--fg2)}
+html[data-theme="light"] .avatar{
+  color:hsl(var(--h) 72% 30%);
+  background:radial-gradient(circle at 32% 26%, hsl(var(--h) 80% 92%), hsl(var(--h) 70% 82%));
+  border-color:hsl(var(--h) 60% 70%);
+  box-shadow:none;
+}
+.hname{font-weight:650;font-size:15.5px;line-height:1.3}
+.hmeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.pill{
+  font-size:11.5px;padding:1.5px 8px;border-radius:20px;border:1px solid var(--line);
+  background:var(--bg3);color:var(--fg2);line-height:1.6;white-space:nowrap;
+}
+.pill.a{color:#8fd18a;border-color:#2f5233;background:#16241a}
+.pill.b{color:#f0a9a0;border-color:#5a2b28;background:#261715}
+.pill.g{color:var(--fg3)}
+
+/* ─────────── 通用卡（对局内 / BP / 文档） ─────────── */
+.row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.gcard{
+  display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--bg2);
+  border:1px solid var(--line);border-radius:var(--r);color:var(--fg);box-shadow:var(--shadow);
+  transition:transform .16s,border-color .16s;
+}
+.gcard:hover{text-decoration:none;transform:translateY(-2px);border-color:var(--line2)}
+.gicon{
+  width:44px;height:44px;border-radius:13px;display:grid;place-items:center;flex:none;
+  font-size:20px;background:var(--bg3);border:1px solid var(--line);
+}
+.gtxt{min-width:0}
+.gtxt b{display:block;font-size:15px;font-weight:650;margin-bottom:2px}
+.gtxt span{display:block;font-size:12.5px;color:var(--fg3);line-height:1.55}
+
+/* ─────────── 折叠卡（条目） ─────────── */
+.entry{
+  background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);margin:0 0 10px;overflow:hidden;
+}
+.entry+.entry{margin-top:10px}
+.entry>summary{
+  list-style:none;cursor:pointer;padding:15px 18px;display:grid;
+  grid-template-columns:auto 1fr auto;gap:12px;align-items:start;
+}
+.entry>summary::-webkit-details-marker{display:none}
+.entry>summary:hover{background:var(--bg3)}
+.entry .id{
+  font-family:var(--mono);font-size:11.5px;color:var(--fg3);padding-top:3px;
+  letter-spacing:.02em;white-space:nowrap;
+}
+.entry .tt{min-width:0}
+.entry .tt b{display:block;font-size:15.5px;font-weight:650;line-height:1.5}
+.entry .tt span{
+  display:block;font-size:13px;color:var(--fg2);margin-top:4px;line-height:1.7;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+}
+.entry .chev{
+  width:20px;height:20px;flex:none;margin-top:3px;color:var(--fg3);
+  transition:transform .18s ease;
+}
+.entry[open] .chev{transform:rotate(90deg)}
+.entry .body{
+  padding:2px 20px 18px 20px;border-top:1px solid var(--line);margin-top:2px;
+  font-size:15px;color:var(--fg);max-width:74ch;
+}
+.entry .body p{margin:.85em 0}
+.entry .body ul,.entry .body ol{padding-left:1.25em;margin:.8em 0}
+.entry .body li{margin:.35em 0}
+.entry .body blockquote{
+  margin:1em 0;padding:.7em 1em;border-left:3px solid var(--accent);
+  background:var(--bg3);border-radius:0 10px 10px 0;color:var(--fg2);font-size:14.5px;
+}
+.entry .body h4{font-size:14px;margin:1.2em 0 .5em;color:var(--fg2);letter-spacing:.3px}
+.entry .body table{
+  width:100%;border-collapse:collapse;margin:1em 0;font-size:14px;
+  display:block;overflow-x:auto;white-space:nowrap;
+}
+.entry .body th,.entry .body td{
+  border:1px solid var(--line);padding:8px 12px;text-align:left;
+}
+.entry .body th{background:var(--bg3);font-weight:600;color:var(--fg2)}
+.kref{font-family:var(--mono);font-size:.9em;padding:0 .3em;border-radius:4px;
+  background:var(--bg3);border:1px solid var(--line);color:var(--accent2)}
+.opp{display:inline-block;font-size:12px;padding:1px 8px;border-radius:20px;
+  border:1px solid var(--line2);color:var(--fg2);background:var(--bg3);margin-left:8px;
+  vertical-align:2px}
+
+/* ─────────── 英雄详情头 ─────────── */
+.hhead{display:flex;align-items:center;gap:18px;margin:0 0 26px;flex-wrap:wrap}
+.hhead .avatar{width:74px;height:74px;font-size:30px;border-radius:24px}
+.hhead h1{margin:0;font-size:clamp(23px,4vw,30px)}
+.hhead .hmeta{margin-top:6px}
+.back{
+  display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--fg3);
+  margin-bottom:14px;
+}
+.back:hover{color:var(--fg2);text-decoration:none}
+
+/* ─────────── 文档页（长文） ─────────── */
+.doc-nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px}
+.doc-nav a{
+  font-size:13px;padding:5px 12px;border-radius:20px;border:1px solid var(--line);
+  background:var(--bg2);color:var(--fg2);
+}
+.doc-nav a:hover,.doc-nav a.on{border-color:var(--accent2);color:var(--fg);text-decoration:none}
+.doc h2{font-size:19px;margin:2em 0 .8em;padding-bottom:.4em;border-bottom:1px solid var(--line)}
+.doc h3{font-size:16px;margin:1.8em 0 .6em}
+.doc p{margin:.9em 0;max-width:74ch}
+.doc ul,.doc ol{padding-left:1.3em;max-width:74ch}
+.doc li{margin:.4em 0}
 .doc blockquote{
-  margin:1em 0; padding:10px 16px; border-left:3px solid var(--accent);
-  background:color-mix(in srgb,var(--accent) 6%,transparent); border-radius:0 8px 8px 0;
-  color:var(--fg2); font-size:14px;
+  margin:1.2em 0;padding:.8em 1.1em;border-left:3px solid var(--accent);
+  background:var(--bg2);border-radius:0 12px 12px 0;color:var(--fg2);
 }
-.doc blockquote p{margin:.25em 0}
-.doc hr{border:0; border-top:1px solid var(--line); margin:2em 0}
-.tw{overflow-x:auto; margin:1em 0}
-.doc table{border-collapse:collapse; width:100%; font-size:13.5px}
-.doc th,.doc td{border:1px solid var(--line); padding:8px 11px; text-align:left; vertical-align:top}
-.doc th{background:var(--bg3); font-weight:600; color:var(--fg2); white-space:nowrap}
-.doc a.kref{
-  font-family:var(--mono); font-size:.86em; padding:1px 4px; border-radius:4px;
-  background:color-mix(in srgb,var(--accent2) 14%,transparent); color:var(--accent2);
-  border:1px solid color-mix(in srgb,var(--accent2) 26%,transparent);
+.doc hr{border:0;border-top:1px solid var(--line);margin:2.4em 0}
+.doc table{
+  width:100%;border-collapse:collapse;margin:1.2em 0;font-size:14px;
+  display:block;overflow-x:auto;
 }
-.doc a.kref:hover{text-decoration:none; background:color-mix(in srgb,var(--accent2) 26%,transparent)}
+.doc th,.doc td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}
+.doc th{background:var(--bg3);font-weight:600;color:var(--fg2);white-space:nowrap}
+.doc tr:nth-child(even) td{background:color-mix(in srgb,var(--bg2) 60%,var(--bg))}
 
-.card{
-  border:1px solid var(--line); background:var(--bg2); border-radius:var(--radius);
-  padding:2px 20px 14px; margin:16px 0; scroll-margin-top:74px;
+/* ─────────── 搜索结果 ─────────── */
+.res-item{
+  display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line);
 }
-.card:target{border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 16%,transparent)}
-.card.flash{animation:fl 1.6s ease-out}
-@keyframes fl{0%{background:color-mix(in srgb,var(--accent) 16%,var(--bg2))}100%{background:var(--bg2)}}
+.res-item .id{font-family:var(--mono);font-size:11.5px;color:var(--fg3);padding-top:4px;flex:none}
+.res-item b{font-weight:650}
+.res-item span{display:block;font-size:13px;color:var(--fg2)}
+.empty{color:var(--fg3);padding:40px 0;text-align:center}
 
-.about{
-  border:1px dashed var(--line); border-radius:var(--radius); padding:14px 18px;
-  margin:20px 0 8px; background:var(--bg2);
+/* ─────────── 页脚 ─────────── */
+.foot{
+  max-width:1080px;margin:60px auto 0;padding:22px clamp(16px,4vw,32px) 0;
+  border-top:1px solid var(--line);color:var(--fg3);font-size:12.5px;
 }
-.about h2{border:0; margin:.2em 0 .5em; padding:0; font-size:15px; color:var(--fg2)}
-
-footer{padding:34px 28px 0; color:var(--fg3); font-size:12px; max-width:900px}
-footer code{font-family:var(--mono)}
-
-#backtop{position:fixed; right:18px; bottom:18px; z-index:30; display:none}
-#backtop.on{display:grid}
-#mask{display:none}
 
 /* ─────────── 响应式 ─────────── */
-@media (max-width:900px){
-  .layout{grid-template-columns:1fr}
-  aside{
-    position:fixed; z-index:40; inset:0 auto 0 0; width:min(84vw,320px);
-    transform:translateX(-102%); transition:transform .22s ease; height:100dvh;
-  }
-  aside.open{transform:none; box-shadow:0 0 40px rgba(0,0,0,.45)}
-  #mask.on{display:block; position:fixed; inset:0; z-index:35; background:rgba(0,0,0,.5)}
-  #menu{display:grid}
-  .doc,.top,footer{padding-left:16px; padding-right:16px}
-  .doc h1{font-size:21px}
+@media (max-width:720px){
+  body{font-size:15px}
+  .top{gap:8px;padding:10px 14px}
+  .bt b{font-size:14px}
+  .logo{width:29px;height:29px;font-size:14.5px}
+  .search{height:38px}
+  .search input{font-size:14px}
+  .icon-btn{width:38px;height:38px}
+  .wrap{padding:22px 14px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+  .hcard{padding:13px 10px 11px;align-items:center;text-align:center;gap:8px}
+  .avatar{width:44px;height:44px;font-size:17.5px}
+  .hname{font-size:13.5px}
+  .hmeta{justify-content:center}
+  .pill{font-size:10.5px;padding:1px 6px}
+  .entry>summary{padding:13px 14px;gap:9px;grid-template-columns:1fr auto}
+  .entry .id{display:none}
+  .entry .body{padding:2px 14px 15px}
+  .hhead .avatar{width:58px;height:58px;font-size:23px;border-radius:19px}
 }
-@media print{
-  aside,.top,#backtop{display:none}
-  .layout{display:block}
-  .card{break-inside:avoid; border-color:#ccc}
-  body{background:#fff; color:#000}
-}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{.top,.foot{display:none}.entry>summary{grid-template-columns:1fr}.entry .body{display:block!important}}
 
 </style>
 </head>
 <body>
-<div class="layout">
-  <aside id="side">
-    <div class="brand"><b>王者荣耀实战知识库</b><span class="tag">S45</span></div>
-    <p class="sub" id="subline"></p>
+<header class="top">
+  <a class="brand" href="#">
+    <span class="logo">王</span>
+    <span class="bt"><b>实战知识库</b><i>S45</i></span>
+  </a>
+  <label class="search">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4-3.3-3.3zM6.5 10a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+    <input id="q" type="search" placeholder="搜英雄或关键词" autocomplete="off">
+  </label>
+  <button id="theme" class="icon-btn" aria-label="切换主题">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 3.2v2.1M12 18.7v2.1M5.8 5.8l1.5 1.5M16.7 16.7l1.5 1.5M3.2 12h2.1M18.7 12h2.1M5.8 18.2l1.5-1.5M16.7 7.3l1.5-1.5"/></svg>
+  </button>
+</header>
 
-    <div class="search">
-      <svg viewBox="0 0 16 16"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4-3.3-3.3zM6.5 10a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
-      <input id="q" type="search" placeholder="搜索条目 / 关键词…" autocomplete="off">
-    </div>
-    <div class="hint">按 <code>/</code> 聚焦，<code>Esc</code> 清空</div>
-    <div class="results" id="res"></div>
+<main id="view" class="wrap"></main>
 
-    <nav id="nav"></nav>
-  </aside>
+<footer class="foot">
+  <span>改内容 → <code>20_kb/*.md</code> ｜ 改样式 → <code>site_src/app.css</code> ｜ 然后重跑 <code>build_site.py</code></span>
+</footer>
 
-  <main>
-    <div class="top">
-      <button class="icobtn" id="menu" aria-label="菜单">☰</button>
-      <span class="crumb" id="crumb">总览</span>
-      <span class="sp"></span>
-      <button class="icobtn" id="theme" aria-label="切换主题">◐</button>
-    </div>
-    <div id="view"></div>
-    <footer id="foot"></footer>
-  </main>
-</div>
-<button class="icobtn" id="backtop" aria-label="回到顶部">↑</button>
-<div id="mask"></div>
-
-<script type="application/json" id="DATA">{"cats": [{"key": "A", "name": "英雄教学", "desc": "这个英雄怎么玩、什么时候强", "about": "<h2>这一类回答什么<\/h2>\n<p><strong>\"这个英雄怎么玩\"<\/strong>——只讲英雄本身，不涉及具体对手。<\/p>\n<p>一个英雄卡要能回答四个问题，顺序不能乱：<\/p>\n<ol><li><strong>他靠什么强<\/strong>（机制，不是数值）<\/li><li><strong>这个机制怎么用出来<\/strong>（连招顺序，是顺序不是技巧清单）<\/li><li><strong>什么时候强、什么时候废<\/strong>（强势期 / 弱势期）<\/li><li><strong>新手最容易在哪一步崩<\/strong>（挂在具体节点上，不单列）<\/li><\/ol>\n<h2>不写什么<\/h2>\n<ul><li>不写\"出装铭文三套方案\"——那是配置，不是判断。<\/li><li>不写\"这个英雄很强\"——必须写成\"在什么条件下强\"。<\/li><li>不写对面是谁——那是 B 类。<\/li><\/ul>\n<h2>编号<\/h2>\n<p><code>K-Axx<\/code>，一个英雄一个文件，文件名用英雄名。<\/p>\n<h2>素材门槛<\/h2>\n<p>一个英雄卡至少要 <strong>1 条 8 分钟以上的全局对局素材<\/strong>，能听到连招顺序和强势期判断。 纯高光集锦、纯出装视频<strong>不够<\/strong>——它们不给\"什么时候不该上\"。<\/p>\n<h2>当前状态<\/h2>\n<div class=\"tw\"><table><thead><tr><th>英雄<\/th><th>分路<\/th><th>素材<\/th><th>可信度<\/th><\/tr><\/thead><tbody><tr><td>苏烈<\/td><td>游走<\/td><td>BV1yke26fEYB（10 分钟全局）<\/td><td>中<\/td><\/tr><\/tbody><\/table><\/div>\n<p>待补（用户英雄池）：中路 1–2 个、游走 1–2 个、对抗路 1 个。<\/p>", "docs": [{"title": "苏烈：一个能自己开节奏的硬辅", "file": "苏烈.md", "intro": "<blockquote><p>本卡只讲英雄本身。<strong>打谁舒服、被谁克<\/strong>看 <code>B_克制关系/苏烈.md<\/code>；<strong>局内第几分钟该干什么<\/strong>看 <code>D_对局内/<\/code>。<\/p><\/blockquote>\n<h2>1. 他靠什么强<\/h2>\n<p><strong>不是靠数值，是靠\"一个人就能完成开团\"这件事。<\/strong><\/p>\n<p>三段普攻的第三段带击飞，二技能能把人推走或挡下技能，大招蓄力可以接闪现。四件套叠起来，苏烈不需要等队友先手——他自己就是先手。<\/p>\n<p>这也是他被归为\"硬辅\"而不是\"保护型辅助\"的原因：他的价值在<strong>制造局面<\/strong>，不在<strong>收拾局面<\/strong>。<\/p>\n<ul><li>来源：BV1yke26fEYB @ 00:33（\"我们身为可以开节奏辅助\"）<\/li><li>来源：BV1yke26fEYB @ 00:20（\"作为精通上手的硬辅是很不错的选择\"）<\/li><\/ul>\n<h2>2. 机制怎么用出来（顺序不能反）<\/h2>\n<pre><code>第 0 步：确认被动在不在（不在 → 下面全部不成立，见 K-A04）\n   ↓\n第 1 步：大招蓄力起手（提前调位置，不要正面硬冲）\n   ↓\n第 2 步：需要贴脸就大闪（蓄力完成瞬间交闪，不是先闪再蓄）\n   ↓\n第 3 步：三棍打出第三段击飞（前两棍只是铺垫，第三棍才是控制）\n   ↓\n第 4 步：二技能收尾——推回人群 or 推开对面的反打手<\/code><\/pre>\n<p><strong>顺序反了就是送<\/strong>：先二技能推过去再开大，人已经被推走，大招蓄力打空，你自己留在原地。<\/p>\n<ul><li>来源：BV1yke26fEYB @ 08:07（\"准备大闪\"）；BV1yke26fEYB @ 08:24（\"我们果断大闪跟上\"）<\/li><li>来源：BV1yke26fEYB @ 03:21（\"准备斩第三棍的击飞，然后闪A接二回推\"）<\/li><li>来源：BV1yke26fEYB @ 02:52（\"三棍击飞接二\"）<\/li><\/ul>\n<h2>3. 分条说明<\/h2>", "entries": [{"id": "K-A01", "cat": "A", "title": "苏烈的核心是\"第三棍\"和\"二技能\"，不是大招", "self": "<h3><a class=\"kref\" href=\"#K-A01\">K-A01<\/a> 苏烈的核心是\"第三棍\"和\"二技能\"，不是大招<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：任何需要苏烈先手的局面<\/li><li><strong>判断依据<\/strong>：对面站位是否进入三段普攻的追击距离；二技能冷却是否可用<\/li><li><strong>决策分支<\/strong>：<\/li><li>二技能可用 → 优先用它把对面的开团手<strong>推离<\/strong>，或者把落单的人<strong>推回<\/strong>队友方向<\/li><li>二技能不可用 → 不要用大招硬开，改打三棍逼退<\/li><li><strong>反例<\/strong>：「辅助的大招就是用来开团的」——苏烈大招蓄力期间不能动，盲目蓄力等于把自己钉在原地等人集火。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 02:21；BV1yke26fEYB @ 03:48<\/li><li><strong>可信度<\/strong>：中<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-A02", "cat": "A", "title": "二技能有两个完全不同的用途，别只用一个", "self": "<h3><a class=\"kref\" href=\"#K-A02\">K-A02<\/a> 二技能有两个完全不同的用途，别只用一个<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：二技能可用时<\/li><li><strong>判断依据<\/strong>：对面有没有正在进行的位移/突进技能<\/li><li><strong>决策分支<\/strong>：<\/li><li><strong>挡<\/strong>：对面开团手（如孙策开大）冲过来时，用二技能挡在他和自己 C 位之间<\/li><li><strong>推<\/strong>：抓落单时把目标推向队友方向，不是推离<\/li><li><strong>反例<\/strong>：「二技能就是个位移」——它同时是<strong>拦截<\/strong>手段。挡下一次开团的价值，往往高于推一个人。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 03:48；BV1yke26fEYB @ 02:21<\/li><li><strong>可信度<\/strong>：中<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-A03", "cat": "A", "title": "被动是资源，不是保命符", "self": "<h3><a class=\"kref\" href=\"#K-A03\">K-A03<\/a> 被动是资源，不是保命符<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：每次准备进场前<\/li><li><strong>判断依据<\/strong>：被动是否可用（有 / 无）；队友是否在附近能\"点灯\"<\/li><li><strong>决策分支<\/strong>：<\/li><li>有被动 → 可以硬吃一波伤害，打出被动后还能给附近的双 C 回血<\/li><li>无被动 → <strong>不许硬接<\/strong>，只能打边缘消耗<\/li><li><strong>反例<\/strong>：「我是肉辅，先冲进去扛」——没被动时苏烈就是一个普通近战，进去等于送人头。字幕里出现过\"没点到灯，不然可以二技能跑\"，说明<strong>被动依赖队友点亮<\/strong>，队友不在时它根本不算数。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 04:00；BV1yke26fEYB @ 04:14；BV1yke26fEYB @ 06:31<\/li><li><strong>可信度<\/strong>：中高（\"点灯\"细节来自实战解说，非二手攻略）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-A04", "cat": "A", "title": "前期不要抢打野的尾刀", "self": "<h3><a class=\"kref\" href=\"#K-A04\">K-A04<\/a> 前期不要抢打野的尾刀<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：开局帮打野刷野<\/li><li><strong>判断依据<\/strong>：打野是否已出打野刀<\/li><li><strong>决策分支<\/strong>：前期<strong>不补最后一刀<\/strong>，让小兵/野怪由打野收掉，帮他叠层数<\/li><li><strong>反例<\/strong>：「帮打野就是帮他打快」——抢了尾刀，他少一层，你多几十块，这笔账是亏的。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 02:28<\/li><li><strong>可信度<\/strong>：中（这条其实通用，不限于苏烈）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>\n<h2>4. 新手最容易崩在哪一步<\/h2>\n<ul><li><strong>在第 0 步（确认被动）上<\/strong>：忘记看被动，进场被判死一次之后整局都不敢开团，从\"开节奏\"退化成\"挂机跟团\"。<\/li><li><strong>在第 3 步（三棍）上<\/strong>：打两棍就急着交二技能，第三段击飞永远打不出来——苏烈的控制全在第三棍上。<\/li><\/ul>\n<h2>5. 待补<\/h2>\n<ul><li>具体数值（被动冷却、大招蓄力时长、二技能距离）<strong>未从素材中获得<\/strong>，需官网英雄页核对后补。<\/li><li>出装/铭文<strong>故意不写<\/strong>，见 <code>_说明.md<\/code>。<\/li><li>强势期/弱势期缺素材（该视频是顺风局，看不出逆风时苏烈的下限）。<\/li><\/ul>"}]}]}, {"key": "B", "name": "克制关系", "desc": "打谁舒服、被谁克、为什么", "about": "<h2>这一类回答什么<\/h2>\n<p><strong>\"打谁舒服、被谁克、为什么\"<\/strong>——必须带一个具体对手。同一条结论换个对手就不成立，才叫克制。<\/p>\n<h2>判定克制的三层（方法，非素材结论）<\/h2>\n<p>一条\"谁克谁\"如果说不清属于哪一层，就不许入库：<\/p>\n<div class=\"tw\"><table><thead><tr><th>层<\/th><th>含义<\/th><th>例子<\/th><th>稳定性<\/th><\/tr><\/thead><tbody><tr><td><strong>机制克<\/strong><\/td><td>A 的核心机制正好被 B 的机制废掉<\/td><td>苏烈的二技能能挡下冲脸的位移<\/td><td>最稳，改数值也不变<\/td><\/tr><tr><td><strong>数值克<\/strong><\/td><td>同一套打法，换血算不过<\/td><td>前期对拼永远差一截<\/td><td>会随版本变，必须挂版本号<\/td><\/tr><tr><td><strong>节奏克<\/strong><\/td><td>谁先到强势期谁赢<\/td><td>前期弱势英雄遇到压制型英雄<\/td><td>看分段和双方发挥，最不稳<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>优先级<\/strong>：能写成机制克的，就不要写成数值克。因为数值会被改，机制不会。<\/p>\n<h2>写法<\/h2>\n<p>每条必须写明：<\/p>\n<ol><li><strong>针对哪个对手<\/strong>（具体英雄，不许写\"刺客\"这种类别）<\/li><li><strong>属于哪一层<\/strong>（机制/数值/节奏）<\/li><li><strong>我该怎么做<\/strong>（不是\"小心点\"，是可执行的动作）<\/li><li><strong>反向<\/strong>：这个对手有没有反制手段<\/li><\/ol>\n<h2>不写什么<\/h2>\n<ul><li>不写\"XX 是万能辅助\"\"XX 没有克制\"——说不出被谁克，说明还没查清。<\/li><li>不写只靠数值的结论而不挂版本号。<\/li><\/ul>\n<h2>编号<\/h2>\n<p><code>K-Bxx<\/code>，按英雄分文件。<\/p>\n<h2>当前状态<\/h2>\n<div class=\"tw\"><table><thead><tr><th>英雄<\/th><th>已记录对位<\/th><th>素材<\/th><\/tr><\/thead><tbody><tr><td>苏烈<\/td><td>孙策、云缨<\/td><td>BV1yke26fEYB<\/td><\/tr><tr><td>王维<\/td><td>嫦娥<\/td><td>BV15EJk6fEwX<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>这一类是全库最薄的。<\/strong> 需要专门的\"对位\"素材（标题含\"打XX\"\"XX怎么打\"的视频），当前一条都没采到。<\/p>", "docs": [{"title": "王维：克谁、怕谁", "file": "王维.md", "intro": "<blockquote><p>英雄本身怎么玩见 <code>A_英雄教学/<\/code>（王维卡尚未建，缺独立素材）。<\/p><\/blockquote>", "entries": [{"id": "K-B03", "cat": "B", "title": "对嫦娥：一级打不过，别抢线", "self": "<h3><a class=\"kref\" href=\"#K-B03\">K-B03<\/a> 对嫦娥：一级打不过，别抢线<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>针对对手<\/strong>：嫦娥（中路）<\/li><li><strong>克制层级<\/strong>：<strong>节奏克<\/strong>（王维一级弱势，嫦娥一级能压）<\/li><li><strong>我该怎么做<\/strong>：<\/li><li>一技能<strong>只打后排兵<\/strong>，不打人<\/li><li>目的不是消耗，是<strong>防止被卡线掉状态<\/strong><\/li><li>一旦掉状态就退回塔后，交给 <code>D_对局内/04_对线期.md<\/code> 的 <a class=\"kref\" href=\"#K-D02\">K-D02<\/a> 处理<\/li><li><strong>反向反制<\/strong>：这条只在一级成立。王维是\"弱前期强后期\"型，<strong>撑过前期后对位关系会反转<\/strong>——不要在 3 级后还按\"打不过\"处理。<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 00:23；BV15EJk6fEwX @ 00:27；BV15EJk6fEwX @ 00:30<\/li><li><strong>可信度<\/strong>：中（单来源，且 UP 主只给了\"对面是嫦娥\"这一个样本）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>\n<h2>待补<\/h2>\n<ul><li>王维克谁（素材只讲了对嫦娥被压这一侧）<\/li><li>王维对其他强势中路（如不知火舞类突进）的表现<\/li><\/ul>"}]}, {"title": "苏烈：克谁、怕谁", "file": "苏烈.md", "intro": "<blockquote><p>英雄本身怎么玩看 <code>A_英雄教学/苏烈.md<\/code>。<\/p><\/blockquote>", "entries": [{"id": "K-B01", "cat": "B", "title": "对孙策：机制克——二技能能挡下他的船", "self": "<h3><a class=\"kref\" href=\"#K-B01\">K-B01<\/a> 对孙策：机制克——二技能能挡下他的船<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>针对对手<\/strong>：孙策（开大冲脸）<\/li><li><strong>克制层级<\/strong>：<strong>机制克<\/strong><\/li><li><strong>我该怎么做<\/strong>：孙策开大的一瞬间，把二技能放在<strong>他和自家 C 位之间<\/strong>，用身位当墙。挡下来之后不要追，退回 C 位旁边。<\/li><li><strong>反向反制<\/strong>：孙策可以等你二技能交完再开船；所以<strong>二技能不要提前交在别的地方<\/strong>。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 03:48<\/li><li><strong>可信度<\/strong>：中（单来源实战解说）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-B02", "cat": "B", "title": "对云缨：她的霸体期间你什么都做不了，等结束再推", "self": "<h3><a class=\"kref\" href=\"#K-B02\">K-B02<\/a> 对云缨：她的霸体期间你什么都做不了，等结束再推<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>针对对手<\/strong>：云缨（大招霸体）<\/li><li><strong>克制层级<\/strong>：<strong>机制克（反向）<\/strong>——这条是<strong>苏烈被克<\/strong>，不是克别人<\/li><li><strong>我该怎么做<\/strong>：云缨开大期间不要试图控制她，<strong>等霸体结束<\/strong>再往队友方向推。<\/li><li><strong>反例<\/strong>：「我是硬辅，控住就行」——霸体期间控制无效，你的三棍和大招全部白交，还把自己留在她身边。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 04:55；BV1yke26fEYB @ 04:57<\/li><li><strong>可信度<\/strong>：中高（解说里明确说了\"他的大招有霸体，插不了火，等他结束往宫本那边推\"）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>\n<h2>待补<\/h2>\n<ul><li>苏烈怕哪些远程消耗型辅助（无素材）<\/li><li>苏烈对软辅（大乔、蔡文姬类）的压制关系（无素材）<\/li><li>以上两条需要专门的\"对位\"视频，<code>B_克制关系/_说明.md<\/code> 已记门槛<\/li><\/ul>"}]}]}, {"key": "C", "name": "BP", "desc": "选人阶段该怎么定", "about": "<h2>这一类回答什么<\/h2>\n<p><strong>\"选人阶段该怎么定\"<\/strong>——只跟版本、阵容、双方已选英雄有关，不跟具体局势有关。<\/p>\n<h2>现状：<strong>这一类现在是空的，不是没写，是没素材。<\/strong><\/h2>\n<p>已入库 6 个视频，<strong>没有一条是 BP 专项<\/strong>。它们全是\"选完人之后怎么打\"。<\/p>\n<p>所以这里<strong>不放任何 K 条目<\/strong>。按本项目规矩：没有来源就不写结论，宁可空着。<\/p>\n<h2>一条都不写的理由<\/h2>\n<p>BP 结论是最容易被\"经验之谈\"污染的类别——\"XX 必 ban\"\"XX 是版本答案\"这种话在贴吧和短视频里满地都是，但一半是过时的、一半是低分段的。<strong>没有实测来源就写进来，等于把噪音存进知识库，还会污染 D 类的判断基础。<\/strong><\/p>\n<h2>要填这个坑，需要什么素材<\/h2>\n<div class=\"tw\"><table><thead><tr><th>素材类型<\/th><th>门槛<\/th><th>为什么<\/th><\/tr><\/thead><tbody><tr><td>版本 BP 解析<\/td><td>8–20 分钟，明确讲<strong>先手/后手<\/strong>顺序<\/td><td>BP 的核心是顺序，不是名单<\/td><\/tr><tr><td>高分段实战 BP<\/td><td>带分段标识（荣耀/巅峰），录播整局选人界面<\/td><td>低分段 BP 逻辑完全不同<\/td><\/tr><tr><td>版本强势榜<\/td><td>官方或营地数据，<strong>必须带统计日期<\/strong><\/td><td>名单类内容 3 周就过时<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>采法<\/strong>（P2 执行）：<\/p>\n<pre><code>关键词：王者荣耀 BP / 王者荣耀 选人 思路 / 王者荣耀 ban位 / 王者荣耀 阵容搭配\n过滤：8 分钟以上、tag 含「王者荣耀」、近 60 天、标题不含\"版本答案\"\"必ban\"<\/code><\/pre>\n<h2>编号<\/h2>\n<p><code>K-Cxx<\/code>。<strong>现阶段 0 条。<\/strong><\/p>\n<h2>与 D 类的边界<\/h2>\n<p>BP 结束后进入 D 类。C 类不给\"第几分钟该干什么\"，D 类不给\"该选谁\"。<\/p>", "docs": []}, {"key": "D", "name": "对局内", "desc": "现在这一刻该干什么", "about": "<h2>这一类回答什么<\/h2>\n<p><strong>\"现在这一刻该干什么\"<\/strong>——每一条都必须带时间点（0:45 / 4 分钟 / 10 分钟），不带时间点的结论不属于这里。<\/p>\n<h2>结构：按对局时间顺序推进，节节相扣<\/h2>\n<pre><code>01 选人 ──► 02 开局前90秒 ──► 03 前四分钟 ──► 04 对线期 ──► 05 第一波转线\n                                                              │\n05 ──► 06 中期资源 ──► 07 团战 ──┬──► 08 顺风推进 ──┐\n              ▲                  └──► 09 逆风止损 ──┴──► 10 终结比赛\n              │\n     04 ─(无对线权且持续到4分钟，直接跳 09)─┘<\/code><\/pre>\n<p><strong>08 和 09 是同一节点的两个分支，不是两章并列。<\/strong> 04 → 09 这条斜边是\"跳节\"路径：对线期就崩了的话，05/06/07 全部不成立，直接进止损逻辑。这条边是清单式攻略给不出的东西。<\/p>\n<h2>读法<\/h2>\n<ol><li>先看当前局的时间点，定位到哪一节；<\/li><li>读那节的<strong>判断树<\/strong>，找自己正卡在哪个判据上；<\/li><li>只看那个判据对应的 K 条目，<strong>不要通读<\/strong>；<\/li><li>条目里的「反例」比「结论」值钱。<\/li><\/ol>\n<h2>硬规矩（新增内容必须遵守）<\/h2>\n<ol><li><strong>文件名是一个\"决定\"，不是话题。<\/strong> 不许出现\"英雄\"\"铭文\"\"出装\"这类名词短语。<\/li><li><strong>每节第一节必须是\"上一节留下的问题\"<\/strong>，且点名上一节哪个分支留下了它。断链的节不许存在。<\/li><li><strong>易错点按环节归位，不单列。<\/strong> 禁止\"本节易错点：①②③\"，错必须挂在它所属的判断节点下。<\/li><\/ol>\n<h2>当前状态<\/h2>\n<div class=\"tw\"><table><thead><tr><th>节<\/th><th>回答的决定<\/th><th>状态<\/th><\/tr><\/thead><tbody><tr><td>01 选人<\/td><td>我拿什么，取决于对面已经选了什么<\/td><td>待写<\/td><\/tr><tr><td>02 开局前90秒<\/td><td>我一级站哪、第一波去哪<\/td><td>素材已备（BV1yke26fEYB）<\/td><\/tr><tr><td>03 前四分钟<\/td><td>这一波我该不该抢线<\/td><td>待写<\/td><\/tr><tr><td><strong>04 对线期<\/strong><\/td><td><strong>这波线清完，我该往哪走<\/strong><\/td><td>✅ 8 条<\/td><\/tr><tr><td>05 第一波转线<\/td><td>动起来之后先去哪一路<\/td><td>待写<\/td><\/tr><tr><td>06 中期资源<\/td><td>下一个资源点该不该争<\/td><td>待写<\/td><\/tr><tr><td>07 团战<\/td><td>这波团我站哪、什么时候进<\/td><td>待写<\/td><\/tr><tr><td>08 顺风推进<\/td><td>拿到优势先推塔还是先控野<\/td><td>待写<\/td><\/tr><tr><td>09 逆风止损<\/td><td>打不过时损失怎么止住<\/td><td>待写<\/td><\/tr><tr><td>10 终结比赛<\/td><td>怎么把优势变成水晶<\/td><td>待写<\/td><\/tr><\/tbody><\/table><\/div>", "docs": [{"title": "主线地图", "file": "00_主线地图.md", "intro": "<p>读完这一页，你应该知道<strong>这局该按什么顺序想事<\/strong>，而不是\"有多少个知识点\"。<\/p>\n<h2>决策主线（节间依赖）<\/h2>\n<pre><code>01 选人 ──► 02 开局前90秒 ──► 03 前四分钟 ──► 04 对线期 ──► 05 第一波转线\n                                                              │\n05 ──► 06 中期资源 ──► 07 团战 ──┬──► 08 顺风推进 ──┐\n              ▲                  └──► 09 逆风止损 ──┴──► 10 终结比赛\n              │\n     04 ─(无对线权且持续到4分钟，直接跳 09)─┘<\/code><\/pre>\n<p>实线是正常推进；<strong>04 → 09 这条斜边是\"跳节\"路径<\/strong>——对线期就崩了的话，05、06、07 全部不成立，要直接进止损逻辑。清单式知识库给不出这条边。<\/p>\n<h2>每节回答的问题<\/h2>\n<div class=\"tw\"><table><thead><tr><th>节<\/th><th>只回答这一个决定<\/th><th>状态<\/th><\/tr><\/thead><tbody><tr><td>01 选人<\/td><td>我拿什么英雄，取决于对面已经选了什么<\/td><td>待写<\/td><\/tr><tr><td>02 开局前90秒<\/td><td>我一级站哪、第一波去哪<\/td><td>素材已备（BV1yke26fEYB 开局公式）<\/td><\/tr><tr><td>03 前四分钟<\/td><td>这一波我该不该抢线<\/td><td>待写<\/td><\/tr><tr><td><strong>04 对线期<\/strong><\/td><td><strong>这波线清完，我该往哪走<\/strong><\/td><td>✅ 已完成<\/td><\/tr><tr><td>05 第一波转线<\/td><td>我动起来之后，先去哪一路<\/td><td>待写<\/td><\/tr><tr><td>06 中期资源<\/td><td>下一个资源点该不该争<\/td><td>待写<\/td><\/tr><tr><td>07 团战<\/td><td>这波团我该站在哪、什么时候进<\/td><td>待写<\/td><\/tr><tr><td>08 顺风推进<\/td><td>拿到优势后，先推塔还是先控野<\/td><td>待写<\/td><\/tr><tr><td>09 逆风止损<\/td><td>打不过的时候，损失怎么止住<\/td><td>待写<\/td><\/tr><tr><td>10 终结比赛<\/td><td>怎么把优势变成水晶<\/td><td>待写<\/td><\/tr><\/tbody><\/table><\/div>\n<h2>全库底层判据（压过所有技巧性结论）<\/h2>\n<p><strong>判断\"能不能打\"，看的是「战斗力差 × 能不能及时到达」，不是经济差。<\/strong><\/p>\n<ul><li>经济差只是战斗力差的一种来源，不是唯一来源。<\/li><li>信息不足时，先问\"我到得了吗\"，再问\"我打得过吗\"。<\/li><li>这条来自 <code>BV1i2n96AEvp @ 02:31<\/code>，原文：\"速度的真正含义就是看战斗力的影响是否能够及时达到目标区域\"。<\/li><\/ul>\n<h2>读这套东西的正确姿势<\/h2>\n<ol><li>先看当前局的<strong>时间点<\/strong>，定位到哪一节；<\/li><li>读那节的\"判断树\"，找自己正卡在哪个判据上；<\/li><li>只看那个判据对应的 K 条目，不要通读；<\/li><li>条目里的\"反例\"比\"结论\"更值钱——那是别人踩过的坑。<\/li><\/ol>\n<h2>三条写作硬规矩（新增内容必须遵守）<\/h2>\n<ol><li><strong>文件名是一个\"决定\"，不是话题。<\/strong> 不许出现\"英雄\"\"铭文\"\"出装\"这类名词短语。<\/li><li><strong>每节第一节必须是\"上一节留下的问题\"<\/strong>，且点名上一节哪个分支留下了它。断链的节不许存在。<\/li><li><strong>易错点按环节归位，不单列。<\/strong> 禁止\"本节易错点：①②③\"，错必须挂在它所属的判断节点下。<\/li><\/ol>", "entries": []}, {"title": "04 对线期：这波线清完，我该往哪走", "file": "04_对线期.md", "intro": "<blockquote><p><strong>依赖<\/strong>：03 前四分钟（结论：线权来自第一波谁先清完） <strong>被依赖<\/strong>：05 第一波转线（本节产出的「可动窗口」是 05 的输入）；09 逆风止损（本节判定\"没线权\"且持续到 4 分钟，直接跳 09）<\/p><\/blockquote>\n<h2>0. 上一节留下的问题<\/h2>\n<p>03 结尾留下的是：<strong>\"你先到 2 级了，然后呢？\"<\/strong><\/p>\n<p>先到 2 级只说明你<strong>有了一次清线优势<\/strong>，不等于你能走。这一节要回答的，是这次优势能不能换成地图上的东西——换不成，优势会在 90 秒内自己蒸发。<\/p>\n<h2>1. 本节只回答一个决定<\/h2>\n<p><strong>这一波线清完之后，我是往河道走、往边路走，还是退回塔后等下一波？<\/strong><\/p>\n<p>不是\"怎么打得更好\"，是\"这一步该不该动\"。操作的差距在这个决定面前是次要的。<\/p>\n<h2>2. 判断树<\/h2>\n<pre><code>中线清完 / 即将清完（判断起点）\n│\n├─ 判据 A：我有没有线权？（看谁的小兵更多、谁先推过去）\n│   ├─ 没有（我方兵线被压回塔前，或我每波都在塔下补刀）\n│   │   ├─ 判据 A1：对面法师是否已经离开中线？（小地图 8 秒内无其视野）\n│   │   │   ├─ 是 → 【K-D01】不尾随，往反方向去拿资源\n│   │   │   └─ 否 → 【K-D02】塔后过线，同时给边路打信号\n│   │   └─ 判据 A2：我这一波掉了多少状态？（血量 &lt;60% 且无闪现）\n│   │       ├─ 是 → 【K-D03】回城，不要为了保线硬撑\n│   │       └─ 否 → 留在塔后等下一波\n│   └─ 有（我方小兵更多，或对面被迫交技能补刀）\n│       ├─ 判据 B：下一波兵到线还需多久？\n│       │   ├─ &gt;8 秒 → 够一次短游，进判据 C\n│       │   └─ ≤8 秒 → 【K-D04】不动，把线再推一波更赚\n│       └─ 判据 C：我方打野在哪？\n│           ├─ 在我方半区/河道 → 【K-D05】跟他走同一侧，去做视野或反野\n│           └─ 位置未知/在对面半区 → 【K-D06】只占中轴草，不深入\n└─ 判据 D：这波我死了或刚复活\n    └─ 【K-D07】先回中线过线，不要先参团<\/code><\/pre>\n<p>每个叶子都对应下面一个 K 条目。<strong>树里没有\"视情况而定\"这种分支<\/strong>——出现这三个字说明判据没写清。<\/p>\n<h2>3. 判断依据<\/h2>\n<div class=\"tw\"><table><thead><tr><th>变量<\/th><th>在哪看<\/th><th>阈值 / 取值<\/th><th>影响哪个分支<\/th><\/tr><\/thead><tbody><tr><td>线权<\/td><td>双方小兵数量与位置<\/td><td>我方小兵 ≥ 对方且未进塔<\/td><td>判据 A<\/td><\/tr><tr><td>对面法师视野<\/td><td>小地图<\/td><td>消失 &gt;8 秒<\/td><td>A1<\/td><\/tr><tr><td>自身血量 / 召唤师技能<\/td><td>血条 + 技能栏<\/td><td>血量 &lt;60% 且无闪现<\/td><td>A2<\/td><\/tr><tr><td>下一波兵到线时间<\/td><td>兵线节奏（约 30 秒一波）<\/td><td>&gt;8 秒<\/td><td>B<\/td><\/tr><tr><td>我方打野位置<\/td><td>小地图<\/td><td>己方半区 / 未知<\/td><td>C<\/td><\/tr><tr><td>是否刚复活<\/td><td>复活计时<\/td><td>—<\/td><td>D<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>底层判据（适用于全库）<\/strong>：判断\"能不能打\"看的不是经济差，是<strong>战斗力差 × 能不能及时到达<\/strong>。信息不足时这条压过一切技巧性结论——这条来自 <code>BV1i2n96AEvp<\/code> 的框架，原文是\"速度的真正含义就是看战斗力的影响是否能够及时达到目标区域\"。<\/p>\n<h2>4. 分支说明<\/h2>", "entries": [{"id": "K-D01", "cat": "D", "title": "没线权，对面法师走了——我不跟，去反方向", "self": "<h3><a class=\"kref\" href=\"#K-D01\">K-D01<\/a> 没线权，对面法师走了——我不跟，去反方向<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45（2026-09-23 起）；S46 待复核<\/li><li><strong>触发条件<\/strong>：我方中路无线权（兵线被压回塔前）；对面法师小地图消失 &gt;8 秒<\/li><li><strong>判断依据<\/strong>：对面法师的消失方向（看小地图最后视野朝向哪一路）；我方另一路是否有可拿资源<\/li><li><strong>决策分支<\/strong>：<\/li><li>对面法师去上 → <strong>我去下路<\/strong>，拿河蟹/兵线/野区小资源<\/li><li>对面法师去下 → <strong>我去上路<\/strong>，同理<\/li><li>完全看不出方向 → 不动，塔后过线<\/li><li><strong>反例<\/strong>：「对面法师去支援了，我赶紧跟过去」——你没有线权，走过去比他慢 5 秒以上，到了正好接他一套技能，还把中线白送。<strong>尾随强势法师作用不大，不如反方向拿资源。<\/strong><\/li><li><strong>依赖<\/strong>：依赖 <a class=\"kref\" href=\"#K-D02\">K-D02<\/a>（先要能安全过线）<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 00:38；BV15EJk6fEwX @ 00:41<\/li><li><strong>可信度<\/strong>：高（全局思路复盘，非剪辑集锦；与《一野二边三射四中》的开局逻辑一致）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-D02", "cat": "D", "title": "没线权时的过线方式：塔后过，不打信号就完事", "self": "<h3><a class=\"kref\" href=\"#K-D02\">K-D02<\/a> 没线权时的过线方式：塔后过，不打信号就完事<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：判定为无线权状态，且需要继续吃中线经济<\/li><li><strong>判断依据<\/strong>：对面法师的消耗距离；我方塔的血量<\/li><li><strong>决策分支<\/strong>：<\/li><li>站在<strong>塔后<\/strong>过线（不是塔前补刀），同时观察对面法师动向<\/li><li>给边路打信号，说明\"我这路被压，你们注意对面中单可能来\"<\/li><li><strong>反例<\/strong>：「我打个信号让队友别打就行了」——这条被明确否掉了：对面法师+打野一起进你们野区，或者四包二越你们下路，一个信号拦不住。<strong>打信号不能替代你到场<\/strong>。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 01:03；BV15EJk6fEwX @ 01:10<\/li><li><strong>可信度<\/strong>：高<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-D03", "cat": "D", "title": "血线被打到 60% 以下且没闪现——回家，别保线", "self": "<h3><a class=\"kref\" href=\"#K-D03\">K-D03<\/a> 血线被打到 60% 以下且没闪现——回家，别保线<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：中路对线期，血量 &lt;60%，闪现已交或在冷却<\/li><li><strong>判断依据<\/strong>：对面法师的技能冷却与斩杀线；我方塔下是否安全<\/li><li><strong>决策分支<\/strong>：<\/li><li>直接回城，接受掉 1–2 个兵<\/li><li>若对面法师蓝量也不健康且无法越塔 → 可以再撑一波，但要站在塔后<\/li><li><strong>反例<\/strong>：「我血少但不能掉线，硬吃一波」——<strong>掉状态之后轻则被单杀、丢闪现，重则丢野区<\/strong>。这是\"为了一波兵输掉整条线\"的典型。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 00:30；BV15EJk6fEwX @ 00:31<\/li><li><strong>可信度<\/strong>：高<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-D04", "cat": "D", "title": "有线权但下一波兵 8 秒内到——别走，再推一波", "self": "<h3><a class=\"kref\" href=\"#K-D04\">K-D04<\/a> 有线权但下一波兵 8 秒内到——别走，再推一波<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：有明确线权；下一波兵线到线时间 ≤8 秒<\/li><li><strong>判断依据<\/strong>：兵线节奏（约 30 秒一波）；当前小兵数量<\/li><li><strong>决策分支<\/strong>：留在线上再推一波，把兵线送进对面塔，让对面疲于补塔刀<\/li><li><strong>反例<\/strong>：「有线权就立刻游走」——走到一半兵线回来，你既没拿到资源也没吃到线，两头空。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 00:53<\/li><li><strong>可信度<\/strong>：中（阈值为 8 秒的推算值，UP 主未给具体秒数，需实战校准）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-D05", "cat": "D", "title": "有线权且打野在同侧——跟他走，别自己单走", "self": "<h3><a class=\"kref\" href=\"#K-D05\">K-D05<\/a> 有线权且打野在同侧——跟他走，别自己单走<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：有线权；我方打野位于己方半区或河道<\/li><li><strong>判断依据<\/strong>：打野位置与行进方向；对面打野是否已在小地图暴露<\/li><li><strong>决策分支<\/strong>：与打野走同一侧，做视野或反野；两人一起才有交换价值<\/li><li><strong>反例<\/strong>：「我自己先去探一下」——单人进野区在无视野情况下大概率被抓，而这次被抓会把刚拿到的线权一起吐出去。<\/li><li><strong>依赖<\/strong>：依赖 <a class=\"kref\" href=\"#K-D04\">K-D04<\/a>（先确认可动窗口）<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 02:11；BV15EJk6fEwX @ 02:14<\/li><li><strong>可信度<\/strong>：中高<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-D06", "cat": "D", "title": "打野位置不明——只占中轴草，不深入", "self": "<h3><a class=\"kref\" href=\"#K-D06\">K-D06<\/a> 打野位置不明——只占中轴草，不深入<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：有线权，但打野位置未知或在对面上半区<\/li><li><strong>判断依据<\/strong>：小地图打野最后出现位置与时间<\/li><li><strong>决策分支<\/strong>：站在中路两侧草丛占视野（UP 主原话\"一般是站在这个草\"），只做视野不进场<\/li><li><strong>反例<\/strong>：「反正有线权，去对面野区找个机会」——打野位置不明时进对面野区，等于把命交给概率。<\/li><li><strong>依赖<\/strong>：依赖 <a class=\"kref\" href=\"#K-D04\">K-D04<\/a><\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 01:43；BV15EJk6fEwX @ 01:47<\/li><li><strong>可信度<\/strong>：中高<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-D07", "cat": "D", "title": "死了刚复活——先回中线过线，不要先参团", "self": "<h3><a class=\"kref\" href=\"#K-D07\">K-D07<\/a> 死了刚复活——先回中线过线，不要先参团<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：复活后场上正在发生团战或资源争夺<\/li><li><strong>判断依据<\/strong>：兵线位置；团战距离；自身大招冷却<\/li><li><strong>决策分支<\/strong>：<\/li><li>中线有兵且没人清 → <strong>先过线<\/strong>，再决定是否进场<\/li><li>中线已空 → 直接进场<\/li><li><strong>反例<\/strong>：「团战开始了必须去」——线不过，你到场也是白给经济，而且下一波还要被压。<strong>兵线大于团战<\/strong>这条在低分段尤其反直觉。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 03:24；BV15EJk6fEwX @ 03:26<\/li><li><strong>可信度<\/strong>：中（\"兵线大于团战\"是 UP 主的口号式结论，需在 06/07 用其他来源交叉验证）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>"}, {"id": "K-D08", "cat": "D", "title": "对线期的辅助：按「野→边→射→中」的顺序决定第一步", "self": "<h3><a class=\"kref\" href=\"#K-D08\">K-D08<\/a> 对线期的辅助：按「野→边→射→中」的顺序决定第一步<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45（中野辅版本）<\/li><li><strong>触发条件<\/strong>：开局到 1 分钟，辅助决定第一波去哪<\/li><li><strong>判断依据<\/strong>：① 我方打野是否要进攻/防守野区 ② 边路是否有线权可拿 ③ 发育路对线强度 ④ 中路是否需要帮清<\/li><li><strong>决策分支<\/strong>：<\/li><li>打野要偷野 → 去<strong>对抗路<\/strong>拿线权，再协同进野区<\/li><li>打野不偷野 → 去边路尝试一血<\/li><li>都不成立 → 回中帮清线<\/li><li><strong>反例<\/strong>：「辅助就该跟着射手」——这是四个判据里排第三的一条，不是第一条。开局直接去发育路，等于放弃了野区节奏。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 00:47；BV1yke26fEYB @ 00:52<\/li><li><strong>可信度<\/strong>：中（该公式为 UP 主自创命名\"一野二边三射四中\"，非官方；顺序逻辑与 <a class=\"kref\" href=\"#K-D01\">K-D01<\/a> 的反方向拿资源一致，故采信）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>\n<h2>5. 本节的连锁错误（按节点挂，不单列）<\/h2>\n<ul><li><strong>在节点「判据 A 线权」上<\/strong>：把\"我先到 2 级\"当成\"我有线权\"。到 2 级只是一次，线权是持续状态，看的是<strong>这一波谁的小兵更多<\/strong>。<\/li><li><strong>在节点「判据 A1 对面法师消失」上<\/strong>：把\"小地图没有他\"当成\"他走了\"。消失 8 秒内可能只是在草丛里，直接跟过去会撞脸。<\/li><li><strong>在节点「判据 C 打野位置」上<\/strong>：把\"打野刚露头\"当成\"打野在附近\"。露头的位置决定他能不能到，不能到就等于不在。<\/li><li><strong>在节点「判据 D 刚复活」上<\/strong>：默认\"团战优先级最高\"。低分段最常见的死法就是复活后直奔团战，回来发现自己中线已经掉两波。<\/li><\/ul>\n<h2>6. 待验证 / 冲突<\/h2>\n<ul><li><a class=\"kref\" href=\"#K-D04\">K-D04<\/a> 的 8 秒阈值、<a class=\"kref\" href=\"#K-D07\">K-D07<\/a> 的\"兵线大于团战\"均为单一来源，缺第二个 UP 主交叉验证 → <code>30_index/stale.md<\/code> 已登记。<\/li><li>本节的\"线权\"定义在中路成立，<strong>对抗路不适用<\/strong>（对抗路优势要控线，中路优势要推线）→ 对抗路支线待 P2 单独写，不要套用本节。<\/li><li>版本风险：王维为 S45 新英雄，若 S46 调整其一级强度，<a class=\"kref\" href=\"#K-D02\">K-D02<\/a> 的\"塔后过线\"前提需重估。<\/li><\/ul>"}]}]}], "overview": [{"title": "导航：四类内容，四种问法", "file": "00_导航.md", "html": "<p>知识库按<strong>内容类型<\/strong>分四类。先判断你问的是哪一类，再去那一类找。<\/p>\n<div class=\"tw\"><table><thead><tr><th>类<\/th><th>你问的是<\/th><th>目录<\/th><th>编号<\/th><th>状态<\/th><\/tr><\/thead><tbody><tr><td><strong>A 英雄教学<\/strong><\/td><td>\"这个英雄怎么玩\"<\/td><td><code>A_英雄教学/<\/code><\/td><td><code>K-Axx<\/code><\/td><td>苏烈 ✅<\/td><\/tr><tr><td><strong>B 克制关系<\/strong><\/td><td>\"打谁舒服、被谁克\"<\/td><td><code>B_克制关系/<\/code><\/td><td><code>K-Bxx<\/code><\/td><td>苏烈 ✅<\/td><\/tr><tr><td><strong>C BP<\/strong><\/td><td>\"选人阶段该怎么定\"<\/td><td><code>C_BP/<\/code><\/td><td><code>K-Cxx<\/code><\/td><td>⚠️ 骨架，无实证<\/td><\/tr><tr><td><strong>D 对局内<\/strong><\/td><td>\"现在这一刻该干什么\"<\/td><td><code>D_对局内/<\/code><\/td><td><code>K-Dxx<\/code><\/td><td>04 对线期 ✅<\/td><\/tr><\/tbody><\/table><\/div>\n<h2>四类的边界（别混）<\/h2>\n<ul><li><strong>A 讲\"这个英雄\"<\/strong>：机制、连招顺序、强势期、废的时候。<strong>不涉及对面是谁<\/strong>。<\/li><li><strong>B 讲\"两个英雄之间\"<\/strong>：必须有具体对手。同一条结论换个对手就不成立，才叫克制。<\/li><li><strong>C 讲\"选人之前\"<\/strong>：只跟阵容和版本有关，不跟具体对局局势有关。<\/li><li><strong>D 讲\"选人之后\"<\/strong>：必须带时间点（0:45 / 4 分钟 / 10 分钟），不带时间点的不是 D 类。<\/li><\/ul>\n<p><strong>判定口诀<\/strong>：结论里出现\"对面是谁\"→ B；出现\"第几分钟\"→ D；只是\"这英雄\"→ A；只是\"这版本/这阵容\"→ C。<\/p>\n<h2>两条跨类的用法<\/h2>\n<ol><li><strong>A 和 B 是配套的<\/strong>：A 告诉你这英雄靠什么强，B 告诉你这个\"靠什么\"在谁面前失效。只看 A 不看 B，会在被克的对局里越打越崩。<\/li><li><strong>C 的输出是 D 的输入<\/strong>：BP 定了你能干什么，D 才谈得上\"这一刻该不该动\"。<\/li><\/ol>\n<h2>全库底层判据（压过所有技巧性结论）<\/h2>\n<p><strong>判断\"能不能打\"，看的是「战斗力差 × 能不能及时到达」，不是经济差。<\/strong><\/p>\n<p>经济差只是战斗力差的一种来源。信息不足时，先问\"我到得了吗\"，再问\"我打得过吗\"。 来源：<code>BV1i2n96AEvp @ 02:31<\/code>。<\/p>\n<h2>读法<\/h2>\n<ol><li>先按上表定位到类，再看那类的 <code>_说明.md<\/code> 了解它回答什么；<\/li><li>只读命中的那一条，<strong>不要通读<\/strong>；<\/li><li>条目里的「反例」比「结论」值钱——那是别人踩过的坑。<\/li><\/ol>"}, {"title": "教学信源名单（S45 实测，2026-10-31）", "file": "95_信源名单.md", "html": "<blockquote><p>这不是「关注列表」，是<strong>取用列表<\/strong>。按问题去取，不要全订。 名单会随赛季变，每 2 周复核一次（看 S45 更新数与平均时长有没有掉）。<\/p><\/blockquote>\n<hr>\n<h2>一、先定判据：凭什么说一个 UP「值得信任」<\/h2>\n<p>信任不来自粉丝量、也不来自播放量。按下面五条打分，缺两条以上就不进名单。<\/p>\n<div class=\"tw\"><table><thead><tr><th>#<\/th><th>判据<\/th><th>怎么验<\/th><th>反例特征<\/th><\/tr><\/thead><tbody><tr><td>1<\/td><td><strong>给判据，不给结论<\/strong><\/td><td>句子结构里有没有「如果/只要/除非/当…时」<\/td><td>全程「视情况而定」「看你怎么玩」<\/td><\/tr><tr><td>2<\/td><td><strong>讲机制，不只讲操作<\/strong><\/td><td>有没有「因为…所以」「原因是」，能不能解释<strong>为什么<\/strong>这样打<\/td><td>「记住这个连招就行」<\/td><\/tr><tr><td>3<\/td><td><strong>给可执行的阈值<\/strong><\/td><td>有没有秒数、经济差、码数、身位、次数<\/td><td>「差不多」「差一点」<\/td><\/tr><tr><td>4<\/td><td><strong>版本对得上<\/strong><\/td><td>标题/内容里的赛季号是否为当前 S45；S44 及更早当作过期<\/td><td>「S43 上路必看」今天还挂首页<\/td><\/tr><tr><td>5<\/td><td><strong>自证 + 不夹带<\/strong><\/td><td>有没有段位/国服/职业教练身份；签名里有没有「包标/上星/复盘××元」<\/td><td>全靠嘴说「我是国服」，且每条视频都在卖课<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>这五条怎么量化<\/strong>：本次实测是把候选人的视频字幕抓下来，统计 条件句密度、因果句密度、数字密度、机制术语浓度、空话密度（无脑/记住就行）， 用样本内百分位合成质量分。播放量只占 5% 权重。<\/p>\n<p><strong>实测发现（值得记住）<\/strong>：<\/p>\n<ul><li>B 站「王者荣耀教学」关键词下，<strong>结构化解说型账号极少<\/strong>，高播放大多是直播切片、<\/li><\/ul>\n<p>实录、对喷、或流水线卖课。<\/p>\n<ul><li>抓了 26 个候选、约 100 条视频字幕，只有 <strong>10 个<\/strong>满足「至少 2 条字幕是人在讲而不是<\/li><\/ul>\n<p>游戏音效」。很多号的字幕轨全是「技能正在冷却」「请求集合」——那是 ASR 把游戏音效 当成说话转录了。<\/p>\n<ul><li>所以：<strong>字幕干净本身就是个质量信号<\/strong>，说明有旁白、有解说意图。<\/li><\/ul>\n<hr>\n<h2>二、S 档：跟着学「判断依据」（讲得清、还在更）<\/h2>\n<div class=\"tw\"><table><thead><tr><th>账号<\/th><th>mid<\/th><th>方向<\/th><th>为什么进 S<\/th><th>要打折扣的地方<\/th><\/tr><\/thead><tbody><tr><td><strong>王者荣耀晚风风<\/strong><\/td><td>481626368<\/td><td>打野·全局<\/td><td>视野与节奏讲成可执行步骤：「利用视野开节奏的两个关键点」；老虎那期给到 3 分 15 秒刷新交汇、7 分钟两倍经济差。术语浓度全场最高<\/td><td>均长仅 5.8 分钟，信息密度高但要反复看；签名有「wx 上星/商务」，业务与内容分开看<\/td><\/tr><tr><td><strong>白菜打野教学<\/strong><\/td><td>67244546<\/td><td>打野·分段突破<\/td><td>因果句密度全场最高，明确讲「你卡在 1900–2100 是因为前 4 分钟」，直接对着一个分段改动作<\/td><td>营销话术重（封神/反复观看）；卖复盘 88/次，注意把「他的服务」和「他说的方法」分开<\/td><\/tr><tr><td><strong>阿泽干货博主<\/strong><\/td><td>322640745<\/td><td>全英雄·国服共创<\/td><td>请国一/2w1 分玩家共创，给的是节点型判据：4 分钟圣杯、10 分钟三件套、10 分钟分均 6800 经济<\/td><td>他也做英雄联盟内容（样本里混进过 369 兰博），<strong>只取王者分区<\/strong><\/td><\/tr><\/tbody><\/table><\/div>\n<h2>三、A 档：单点很硬，按需取（不追全部，只取自己那一路）<\/h2>\n<div class=\"tw\"><table><thead><tr><th>账号<\/th><th>mid<\/th><th>方向<\/th><th>取什么<\/th><\/tr><\/thead><tbody><tr><td><strong>益达兄弟辅助教学<\/strong><\/td><td>298590209<\/td><td>辅助<\/td><td>巅峰最高 2667、总榜第五。出装判据实用（极影 vs 近卫按对面强度与阵容选），九大神辅系列可当辅助入门骨架<\/td><\/tr><tr><td><strong>老杨国服嫦娥<\/strong><\/td><td>1866098100<\/td><td>中路·嫦娥<\/td><td>目标置换讲得清楚：「这波不追求杀人，追求打掉状态、拖刘备到四」——这正是中路该有的思路。吐槽类视频跳过<\/td><\/tr><tr><td><strong>奥特曼zz国一刘备凯<\/strong><\/td><td>18909338<\/td><td>打野·刘备<\/td><td>实战细节密度高（记对面闪现、卡视野蹲人）。签名有上分业务，只取内容<\/td><\/tr><tr><td><strong>夜昧<\/strong><\/td><td>49993700<\/td><td>对抗路<\/td><td>粉丝少但讲得实在：对抗路稳线优先、宁可打不过也别被带节奏；马超存枪的版本差异<\/td><\/tr><\/tbody><\/table><\/div>\n<blockquote><p>A 档的共同限制：<strong>覆盖窄<\/strong>。他们只对自己那一路负责，别拿打野的节奏逻辑去套中路。<\/p><\/blockquote>\n<h2>四、B 档：直播切片与职业选手（学操作与节奏，不学结论）<\/h2>\n<p>你说了切片也看，那这里要分清<strong>看什么<\/strong>：<\/p>\n<blockquote><p>切片天然删掉前提，只留结果。所以切片能用来<strong>验证你已经有的判断<\/strong>， 不能用来<strong>建立判断<\/strong>。看的时候问自己「他为什么这时候上」，而不是记「他这时候上了」。<\/p><\/blockquote>\n<div class=\"tw\"><table><thead><tr><th>账号<\/th><th>mid<\/th><th>类型<\/th><th>用法<\/th><\/tr><\/thead><tbody><tr><td><strong>赖神无所畏惧<\/strong><\/td><td>395931838<\/td><td>大主播·对抗路（230w）<\/td><td>S45 内 21 条但均长 1.7 分钟，是切片形态。适合看对抗路的对线处理与手感，不适合学体系<\/td><\/tr><tr><td><strong>哔哩哔哩王者荣耀赛事<\/strong><\/td><td>392836434<\/td><td>官方赛事（691w）<\/td><td>S45 内 38 条、均长 55 分钟。<strong>这是 BP 与运营的唯一一手素材<\/strong>，也是我们知识库 C 类（BP）目前唯一的可靠来源<\/td><\/tr><tr><td>职业选手本人号（如 AG 超玩会老帅、LGD 教练阿泰）<\/td><td>549922787 / 492870807<\/td><td>职业/教练认证<\/td><td>账号存在且有认证，但按名字检索近期投稿命中为 0，需进空间页确认更新情况；确认后再补进名单<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>切片号的坑<\/strong>：同一选手常有好几个「XX剪辑呺」「XX精彩集锦」。实测其中一个剪辑号 的字幕轨全是歌词和英雄语音，一条讲解都没有——那种号只能当集锦看。 <strong>认准认证标识和署名，不要认名字相似。<\/strong><\/p>\n<h2>五、不进名单的（按行为特征判断，不针对具体人）<\/h2>\n<ol><li><strong>签名 = 卖课目录<\/strong>：「包标」「上星」「加入我们××教」「复盘 ×× 元」，<\/li><\/ol>\n<p>且视频平均时长 &lt; 3 分钟 → 内容被切成钩子，判断链是断的。<\/p>\n<ol><li><strong>纯剪辑号<\/strong>：无旁白、字幕只有歌词/游戏语音。<\/li><li><strong>版本漂移号<\/strong>：标题还挂着 S43/S44，或内容里说「这个版本」但无法对应到 S45。<\/li><li><strong>只讲出装不讲为什么<\/strong>：给一套铭文出装就结束，遇到阵容变化无法迁移。<\/li><\/ol>\n<hr>\n<h2>六、按你的情况排的取用顺序<\/h2>\n<p>你主中辅、在练对抗、目标荣耀。所以不要五个都订，按这个顺序取：<\/p>\n<ol><li><strong>先修判断公式<\/strong>（解决「什么时候该干什么」）<\/li><\/ol>\n<p>→ 哔哩哔哩王者荣耀赛事 的 BP 段 + 晚风风的视野与节奏。 打野视角讲的是资源与到达，中路/游走可以直接迁移。<\/p>\n<ol><li><strong>再补本分路<\/strong>（解决「我这一路怎么打」）<\/li><\/ol>\n<p>→ 益达兄弟（辅助出装判据）→ 老杨（中路目标置换）。<\/p>\n<ol><li><strong>对抗路单练<\/strong>（解决「最近在练的那条路」）<\/li><\/ol>\n<p>→ 赖神切片看对线与手感 → 夜昧看稳线逻辑。<\/p>\n<ol><li><strong>每个新学的点，立刻落成知识库格式<\/strong>：触发条件 → 判据 → 阈值 → 反例。<\/li><\/ol>\n<p>写不成这个格式，说明还没学到手，只是记住了。<\/p>\n<h2>七、复核机制<\/h2>\n<ul><li>每 2 周跑一次 <code>s0_creators.py --stage all<\/code>，看「S45 更新数」和「平均时长」。<\/li><li>更新数掉到 0 或均长掉到 3 分钟以下 → 降档（大概率转成切片/直播形态）。<\/li><li>赛季切换（11-25 切 S46）后，旧名单全部降为「待复核」，重跑一遍再定档。<\/li><\/ul>\n<hr>\n<p>_数据与脚本：<code>40_scripts/s0_creators.py<\/code>（筛选+评分）、<code>40_scripts/subs_browser.py<\/code>（字幕采集）、 <code>40_scripts/bili_api.py<\/code>（接口层）。原始结果：<code>10_sources/creators_scored.json<\/code>。_<\/p>"}, {"title": "版本变更台账", "file": "90_版本变更台账.md", "html": "<p><strong>版本真值只认官方公告，不认任何\"版本答案\"。<\/strong> 每条 K 条目都必须写\"适用版本\"，跨赛季自动进复核队列。<\/p>\n<h2>赛季区间表（2026）<\/h2>\n<div class=\"tw\"><table><thead><tr><th>赛季<\/th><th>名称<\/th><th>开始<\/th><th>结束<\/th><th>依据<\/th><\/tr><\/thead><tbody><tr><td>S42<\/td><td>神佑建木<\/td><td>2026-01-08<\/td><td>2026-04-01<\/td><td>官网公告 tid=791692<\/td><\/tr><tr><td>S43<\/td><td>陌上相逢<\/td><td>2026-04-01<\/td><td>2026-06-24<\/td><td>官网赛季公告<\/td><\/tr><tr><td>S44<\/td><td>—<\/td><td>2026-06-25<\/td><td>2026-09-23<\/td><td>官网赛季公告<\/td><\/tr><tr><td><strong>S45<\/strong><\/td><td><strong>月照长安（当前）<\/strong><\/td><td><strong>2026-09-23<\/strong><\/td><td><strong>2026-11-25<\/strong><\/td><td>官网赛季公告<\/td><\/tr><tr><td>S46<\/td><td>—<\/td><td>2026-11-25<\/td><td>—<\/td><td>官方预告（11-25 0:00–5:00 停服更新）<\/td><\/tr><\/tbody><\/table><\/div>\n<blockquote><p>注意：S45 只有约 63 天，比常规 85–95 天短。<strong>任何按\"三个月一赛季\"推算的结论都要重新核对。<\/strong><\/p><\/blockquote>\n<h2>S45 版本特征（影响内容取舍）<\/h2>\n<ul><li><strong>中野辅版本<\/strong>：打野与辅助的联动权重高于边路单带。<\/li><li>周年庆期间（10/24 前后）活动内容多、<strong>平衡性调整少<\/strong>，教学素材偏旧。<\/li><li>新英雄：王维、蚩奼、大司命、空空儿、孙权、苍、影等；<strong>刀锋宝贝仍在体验服<\/strong>。<\/li><\/ul>\n<h2>已发生的平衡调整（截至 2026-10-31）<\/h2>\n<div class=\"tw\"><table><thead><tr><th>日期<\/th><th>对象<\/th><th>改动<\/th><th>影响的知识点<\/th><\/tr><\/thead><tbody><tr><td>10-30（体验服）<\/td><td>镜<\/td><td>二技能 CD 9~7→10~8（全等级 +1s）；加速 50%→100(+20/Lv)；二技能伤害小幅上调；三技能充能 10→10~8<\/td><td>未入库（打野支线），暂记<\/td><\/tr><tr><td>10-30（体验服）<\/td><td>曜<\/td><td>三技能 CD 15~10→13.5~10<\/td><td>未入库，暂记<\/td><\/tr><tr><td>10-30（体验服）<\/td><td>刀锋宝贝<\/td><td>三技能追踪优化、强化普攻法球修复<\/td><td>未上线正式服，不采信为正式结论<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>体验服改动一律不作为正式服结论入库<\/strong>，只能进本表。<\/p>\n<h2>待办<\/h2>\n<ul><li>[ ] 抓到 S45 官方更新公告原文后，补全本表 9-23 至 10-31 的正式服调整<\/li><li>[ ] S46（11-25）上线后 7 天内，全库过一遍\"适用版本 = S45\"的条目<\/li><\/ul>"}], "meta": {"sub": "当前版本 S45 · 共 15 条 · 更新 2026-10-31", "foot": "每条的「来源」都可回溯到 B 站视频的具体时间戳；无来源不写结论。<br>内容改 <code>20_kb/*.md<\/code>，样式改 <code>site_src/app.css<\/code>，交互改 <code>site_src/app.js<\/code>，然后重跑 <code>build_site.py<\/code>。"}}</script>
+<script type="application/json" id="DATA">{"version": "S45", "heroes": [{"name": "苏烈", "hue": 273, "a": [{"id": "K-A01", "cat": "A", "title": "苏烈的核心是\"第三棍\"和\"二技能\"，不是大招", "self": "<h3><a class=\"kref\" href=\"#K-A01\">K-A01<\/a> 苏烈的核心是\"第三棍\"和\"二技能\"，不是大招<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：任何需要苏烈先手的局面<\/li><li><strong>判断依据<\/strong>：对面站位是否进入三段普攻的追击距离；二技能冷却是否可用<\/li><li><strong>决策分支<\/strong>：<\/li><li>二技能可用 → 优先用它把对面的开团手<strong>推离<\/strong>，或者把落单的人<strong>推回<\/strong>队友方向<\/li><li>二技能不可用 → 不要用大招硬开，改打三棍逼退<\/li><li><strong>反例<\/strong>：「辅助的大招就是用来开团的」——苏烈大招蓄力期间不能动，盲目蓄力等于把自己钉在原地等人集火。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 02:21；BV1yke26fEYB @ 03:48<\/li><li><strong>可信度<\/strong>：中<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45触发条件：任何需要苏烈先手的局面判断依据：对面站位是否进入三段普攻的追击距离；"}, {"id": "K-A02", "cat": "A", "title": "二技能有两个完全不同的用途，别只用一个", "self": "<h3><a class=\"kref\" href=\"#K-A02\">K-A02<\/a> 二技能有两个完全不同的用途，别只用一个<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：二技能可用时<\/li><li><strong>判断依据<\/strong>：对面有没有正在进行的位移/突进技能<\/li><li><strong>决策分支<\/strong>：<\/li><li><strong>挡<\/strong>：对面开团手（如孙策开大）冲过来时，用二技能挡在他和自己 C 位之间<\/li><li><strong>推<\/strong>：抓落单时把目标推向队友方向，不是推离<\/li><li><strong>反例<\/strong>：「二技能就是个位移」——它同时是<strong>拦截<\/strong>手段。挡下一次开团的价值，往往高于推一个人。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 03:48；BV1yke26fEYB @ 02:21<\/li><li><strong>可信度<\/strong>：中<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45触发条件：二技能可用时判断依据：对面有没有正在进行的位移/突进技能决策分支：挡：对面开团手（如孙策开大）冲过来时，用二技能挡在他和自己 C 位之间推：抓落单时把目标推向队友方向…"}, {"id": "K-A03", "cat": "A", "title": "被动是资源，不是保命符", "self": "<h3><a class=\"kref\" href=\"#K-A03\">K-A03<\/a> 被动是资源，不是保命符<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：每次准备进场前<\/li><li><strong>判断依据<\/strong>：被动是否可用（有 / 无）；队友是否在附近能\"点灯\"<\/li><li><strong>决策分支<\/strong>：<\/li><li>有被动 → 可以硬吃一波伤害，打出被动后还能给附近的双 C 回血<\/li><li>无被动 → <strong>不许硬接<\/strong>，只能打边缘消耗<\/li><li><strong>反例<\/strong>：「我是肉辅，先冲进去扛」——没被动时苏烈就是一个普通近战，进去等于送人头。字幕里出现过\"没点到灯，不然可以二技能跑\"，说明<strong>被动依赖队友点亮<\/strong>，队友不在时它根本不算数。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 04:00；BV1yke26fEYB @ 04:14；BV1yke26fEYB @ 06:31<\/li><li><strong>可信度<\/strong>：中高（\"点灯\"细节来自实战解说，非二手攻略）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45触发条件：每次准备进场前判断依据：被动是否可用（有 / 无）；"}, {"id": "K-A04", "cat": "A", "title": "前期不要抢打野的尾刀", "self": "<h3><a class=\"kref\" href=\"#K-A04\">K-A04<\/a> 前期不要抢打野的尾刀<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：开局帮打野刷野<\/li><li><strong>判断依据<\/strong>：打野是否已出打野刀<\/li><li><strong>决策分支<\/strong>：前期<strong>不补最后一刀<\/strong>，让小兵/野怪由打野收掉，帮他叠层数<\/li><li><strong>反例<\/strong>：「帮打野就是帮他打快」——抢了尾刀，他少一层，你多几十块，这笔账是亏的。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 02:28<\/li><li><strong>可信度<\/strong>：中（这条其实通用，不限于苏烈）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>\n<h2>4. 新手最容易崩在哪一步<\/h2>\n<ul><li><strong>在第 0 步（确认被动）上<\/strong>：忘记看被动，进场被判死一次之后整局都不敢开团，从\"开节奏\"退化成\"挂机跟团\"。<\/li><li><strong>在第 3 步（三棍）上<\/strong>：打两棍就急着交二技能，第三段击飞永远打不出来——苏烈的控制全在第三棍上。<\/li><\/ul>\n<h2>5. 待补<\/h2>\n<ul><li>具体数值（被动冷却、大招蓄力时长、二技能距离）<strong>未从素材中获得<\/strong>，需官网英雄页核对后补。<\/li><li>出装/铭文<strong>故意不写<\/strong>，见 <code>_说明.md<\/code>。<\/li><li>强势期/弱势期缺素材（该视频是顺风局，看不出逆风时苏烈的下限）。<\/li><\/ul>", "sum": "适用版本：S45触发条件：开局帮打野刷野判断依据：打野是否已出打野刀决策分支：前期不补最后一刀，让小兵/野怪由打野收掉，帮他叠层数反例：「帮打野就是帮他打快」——抢了尾刀，他少一层，你多几十块…"}], "b": [{"id": "K-B01", "cat": "B", "title": "对孙策：机制克——二技能能挡下他的船", "self": "<h3><a class=\"kref\" href=\"#K-B01\">K-B01<\/a> 对孙策：机制克——二技能能挡下他的船<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>针对对手<\/strong>：孙策（开大冲脸）<\/li><li><strong>克制层级<\/strong>：<strong>机制克<\/strong><\/li><li><strong>我该怎么做<\/strong>：孙策开大的一瞬间，把二技能放在<strong>他和自家 C 位之间<\/strong>，用身位当墙。挡下来之后不要追，退回 C 位旁边。<\/li><li><strong>反向反制<\/strong>：孙策可以等你二技能交完再开船；所以<strong>二技能不要提前交在别的地方<\/strong>。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 03:48<\/li><li><strong>可信度<\/strong>：中（单来源实战解说）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45针对对手：孙策（开大冲脸）克制层级：机制克我该怎么做：孙策开大的一瞬间，把二技能放在他和自家 C 位之间，用身位当墙。", "opp": "孙策"}, {"id": "K-B02", "cat": "B", "title": "对云缨：她的霸体期间你什么都做不了，等结束再推", "self": "<h3><a class=\"kref\" href=\"#K-B02\">K-B02<\/a> 对云缨：她的霸体期间你什么都做不了，等结束再推<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>针对对手<\/strong>：云缨（大招霸体）<\/li><li><strong>克制层级<\/strong>：<strong>机制克（反向）<\/strong>——这条是<strong>苏烈被克<\/strong>，不是克别人<\/li><li><strong>我该怎么做<\/strong>：云缨开大期间不要试图控制她，<strong>等霸体结束<\/strong>再往队友方向推。<\/li><li><strong>反例<\/strong>：「我是硬辅，控住就行」——霸体期间控制无效，你的三棍和大招全部白交，还把自己留在她身边。<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 04:55；BV1yke26fEYB @ 04:57<\/li><li><strong>可信度<\/strong>：中高（解说里明确说了\"他的大招有霸体，插不了火，等他结束往宫本那边推\"）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>\n<h2>待补<\/h2>\n<ul><li>苏烈怕哪些远程消耗型辅助（无素材）<\/li><li>苏烈对软辅（大乔、蔡文姬类）的压制关系（无素材）<\/li><li>以上两条需要专门的\"对位\"视频，<code>B_克制关系/_说明.md<\/code> 已记门槛<\/li><\/ul>", "sum": "适用版本：S45针对对手：云缨（大招霸体）克制层级：机制克（反向）——这条是苏烈被克，不是克别人我该怎么做：云缨开大期间不要试图控制她，等霸体结束再往队友方向推。", "opp": "云缨"}], "n": 6, "b_n": 2, "vs": ["云缨", "孙策"], "incoming": []}, {"name": "王维", "hue": 273, "a": [], "b": [{"id": "K-B03", "cat": "B", "title": "对嫦娥：一级打不过，别抢线", "self": "<h3><a class=\"kref\" href=\"#K-B03\">K-B03<\/a> 对嫦娥：一级打不过，别抢线<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>针对对手<\/strong>：嫦娥（中路）<\/li><li><strong>克制层级<\/strong>：<strong>节奏克<\/strong>（王维一级弱势，嫦娥一级能压）<\/li><li><strong>我该怎么做<\/strong>：<\/li><li>一技能<strong>只打后排兵<\/strong>，不打人<\/li><li>目的不是消耗，是<strong>防止被卡线掉状态<\/strong><\/li><li>一旦掉状态就退回塔后，交给 <code>D_对局内/04_对线期.md<\/code> 的 <a class=\"kref\" href=\"#K-D02\">K-D02<\/a> 处理<\/li><li><strong>反向反制<\/strong>：这条只在一级成立。王维是\"弱前期强后期\"型，<strong>撑过前期后对位关系会反转<\/strong>——不要在 3 级后还按\"打不过\"处理。<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 00:23；BV15EJk6fEwX @ 00:27；BV15EJk6fEwX @ 00:30<\/li><li><strong>可信度<\/strong>：中（单来源，且 UP 主只给了\"对面是嫦娥\"这一个样本）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>\n<h2>待补<\/h2>\n<ul><li>王维克谁（素材只讲了对嫦娥被压这一侧）<\/li><li>王维对其他强势中路（如不知火舞类突进）的表现<\/li><\/ul>", "sum": "适用版本：S45针对对手：嫦娥（中路）克制层级：节奏克（王维一级弱势，嫦娥一级能压）我该怎么做：一技能只打后排兵，不打人目的不是消耗，是防止被卡线掉状态一旦掉状态就退回塔后，交给 D_对局内/…", "opp": "嫦娥"}], "n": 1, "b_n": 1, "vs": ["嫦娥"], "incoming": []}], "general": [{"key": "D", "cat": "对局内", "title": "主线地图", "file": "00_主线地图.md", "intro": "<p>读完这一页，你应该知道<strong>这局该按什么顺序想事<\/strong>，而不是\"有多少个知识点\"。<\/p>\n<h2>决策主线（节间依赖）<\/h2>\n<pre><code>01 选人 ──► 02 开局前90秒 ──► 03 前四分钟 ──► 04 对线期 ──► 05 第一波转线\n                                                              │\n05 ──► 06 中期资源 ──► 07 团战 ──┬──► 08 顺风推进 ──┐\n              ▲                  └──► 09 逆风止损 ──┴──► 10 终结比赛\n              │\n     04 ─(无对线权且持续到4分钟，直接跳 09)─┘<\/code><\/pre>\n<p>实线是正常推进；<strong>04 → 09 这条斜边是\"跳节\"路径<\/strong>——对线期就崩了的话，05、06、07 全部不成立，要直接进止损逻辑。清单式知识库给不出这条边。<\/p>\n<h2>每节回答的问题<\/h2>\n<div class=\"tw\"><table><thead><tr><th>节<\/th><th>只回答这一个决定<\/th><th>状态<\/th><\/tr><\/thead><tbody><tr><td>01 选人<\/td><td>我拿什么英雄，取决于对面已经选了什么<\/td><td>待写<\/td><\/tr><tr><td>02 开局前90秒<\/td><td>我一级站哪、第一波去哪<\/td><td>素材已备（BV1yke26fEYB 开局公式）<\/td><\/tr><tr><td>03 前四分钟<\/td><td>这一波我该不该抢线<\/td><td>待写<\/td><\/tr><tr><td><strong>04 对线期<\/strong><\/td><td><strong>这波线清完，我该往哪走<\/strong><\/td><td>✅ 已完成<\/td><\/tr><tr><td>05 第一波转线<\/td><td>我动起来之后，先去哪一路<\/td><td>待写<\/td><\/tr><tr><td>06 中期资源<\/td><td>下一个资源点该不该争<\/td><td>待写<\/td><\/tr><tr><td>07 团战<\/td><td>这波团我该站在哪、什么时候进<\/td><td>待写<\/td><\/tr><tr><td>08 顺风推进<\/td><td>拿到优势后，先推塔还是先控野<\/td><td>待写<\/td><\/tr><tr><td>09 逆风止损<\/td><td>打不过的时候，损失怎么止住<\/td><td>待写<\/td><\/tr><tr><td>10 终结比赛<\/td><td>怎么把优势变成水晶<\/td><td>待写<\/td><\/tr><\/tbody><\/table><\/div>\n<h2>全库底层判据（压过所有技巧性结论）<\/h2>\n<p><strong>判断\"能不能打\"，看的是「战斗力差 × 能不能及时到达」，不是经济差。<\/strong><\/p>\n<ul><li>经济差只是战斗力差的一种来源，不是唯一来源。<\/li><li>信息不足时，先问\"我到得了吗\"，再问\"我打得过吗\"。<\/li><li>这条来自 <code>BV1i2n96AEvp @ 02:31<\/code>，原文：\"速度的真正含义就是看战斗力的影响是否能够及时达到目标区域\"。<\/li><\/ul>\n<h2>读这套东西的正确姿势<\/h2>\n<ol><li>先看当前局的<strong>时间点<\/strong>，定位到哪一节；<\/li><li>读那节的\"判断树\"，找自己正卡在哪个判据上；<\/li><li>只看那个判据对应的 K 条目，不要通读；<\/li><li>条目里的\"反例\"比\"结论\"更值钱——那是别人踩过的坑。<\/li><\/ol>\n<h2>三条写作硬规矩（新增内容必须遵守）<\/h2>\n<ol><li><strong>文件名是一个\"决定\"，不是话题。<\/strong> 不许出现\"英雄\"\"铭文\"\"出装\"这类名词短语。<\/li><li><strong>每节第一节必须是\"上一节留下的问题\"<\/strong>，且点名上一节哪个分支留下了它。断链的节不许存在。<\/li><li><strong>易错点按环节归位，不单列。<\/strong> 禁止\"本节易错点：①②③\"，错必须挂在它所属的判断节点下。<\/li><\/ol>", "entries": []}, {"key": "D", "cat": "对局内", "title": "04 对线期：这波线清完，我该往哪走", "file": "04_对线期.md", "intro": "<blockquote><p><strong>依赖<\/strong>：03 前四分钟（结论：线权来自第一波谁先清完） <strong>被依赖<\/strong>：05 第一波转线（本节产出的「可动窗口」是 05 的输入）；09 逆风止损（本节判定\"没线权\"且持续到 4 分钟，直接跳 09）<\/p><\/blockquote>\n<h2>0. 上一节留下的问题<\/h2>\n<p>03 结尾留下的是：<strong>\"你先到 2 级了，然后呢？\"<\/strong><\/p>\n<p>先到 2 级只说明你<strong>有了一次清线优势<\/strong>，不等于你能走。这一节要回答的，是这次优势能不能换成地图上的东西——换不成，优势会在 90 秒内自己蒸发。<\/p>\n<h2>1. 本节只回答一个决定<\/h2>\n<p><strong>这一波线清完之后，我是往河道走、往边路走，还是退回塔后等下一波？<\/strong><\/p>\n<p>不是\"怎么打得更好\"，是\"这一步该不该动\"。操作的差距在这个决定面前是次要的。<\/p>\n<h2>2. 判断树<\/h2>\n<pre><code>中线清完 / 即将清完（判断起点）\n│\n├─ 判据 A：我有没有线权？（看谁的小兵更多、谁先推过去）\n│   ├─ 没有（我方兵线被压回塔前，或我每波都在塔下补刀）\n│   │   ├─ 判据 A1：对面法师是否已经离开中线？（小地图 8 秒内无其视野）\n│   │   │   ├─ 是 → 【K-D01】不尾随，往反方向去拿资源\n│   │   │   └─ 否 → 【K-D02】塔后过线，同时给边路打信号\n│   │   └─ 判据 A2：我这一波掉了多少状态？（血量 &lt;60% 且无闪现）\n│   │       ├─ 是 → 【K-D03】回城，不要为了保线硬撑\n│   │       └─ 否 → 留在塔后等下一波\n│   └─ 有（我方小兵更多，或对面被迫交技能补刀）\n│       ├─ 判据 B：下一波兵到线还需多久？\n│       │   ├─ &gt;8 秒 → 够一次短游，进判据 C\n│       │   └─ ≤8 秒 → 【K-D04】不动，把线再推一波更赚\n│       └─ 判据 C：我方打野在哪？\n│           ├─ 在我方半区/河道 → 【K-D05】跟他走同一侧，去做视野或反野\n│           └─ 位置未知/在对面半区 → 【K-D06】只占中轴草，不深入\n└─ 判据 D：这波我死了或刚复活\n    └─ 【K-D07】先回中线过线，不要先参团<\/code><\/pre>\n<p>每个叶子都对应下面一个 K 条目。<strong>树里没有\"视情况而定\"这种分支<\/strong>——出现这三个字说明判据没写清。<\/p>\n<h2>3. 判断依据<\/h2>\n<div class=\"tw\"><table><thead><tr><th>变量<\/th><th>在哪看<\/th><th>阈值 / 取值<\/th><th>影响哪个分支<\/th><\/tr><\/thead><tbody><tr><td>线权<\/td><td>双方小兵数量与位置<\/td><td>我方小兵 ≥ 对方且未进塔<\/td><td>判据 A<\/td><\/tr><tr><td>对面法师视野<\/td><td>小地图<\/td><td>消失 &gt;8 秒<\/td><td>A1<\/td><\/tr><tr><td>自身血量 / 召唤师技能<\/td><td>血条 + 技能栏<\/td><td>血量 &lt;60% 且无闪现<\/td><td>A2<\/td><\/tr><tr><td>下一波兵到线时间<\/td><td>兵线节奏（约 30 秒一波）<\/td><td>&gt;8 秒<\/td><td>B<\/td><\/tr><tr><td>我方打野位置<\/td><td>小地图<\/td><td>己方半区 / 未知<\/td><td>C<\/td><\/tr><tr><td>是否刚复活<\/td><td>复活计时<\/td><td>—<\/td><td>D<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>底层判据（适用于全库）<\/strong>：判断\"能不能打\"看的不是经济差，是<strong>战斗力差 × 能不能及时到达<\/strong>。信息不足时这条压过一切技巧性结论——这条来自 <code>BV1i2n96AEvp<\/code> 的框架，原文是\"速度的真正含义就是看战斗力的影响是否能够及时达到目标区域\"。<\/p>\n<h2>4. 分支说明<\/h2>", "entries": [{"id": "K-D01", "cat": "D", "title": "没线权，对面法师走了——我不跟，去反方向", "self": "<h3><a class=\"kref\" href=\"#K-D01\">K-D01<\/a> 没线权，对面法师走了——我不跟，去反方向<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45（2026-09-23 起）；S46 待复核<\/li><li><strong>触发条件<\/strong>：我方中路无线权（兵线被压回塔前）；对面法师小地图消失 &gt;8 秒<\/li><li><strong>判断依据<\/strong>：对面法师的消失方向（看小地图最后视野朝向哪一路）；我方另一路是否有可拿资源<\/li><li><strong>决策分支<\/strong>：<\/li><li>对面法师去上 → <strong>我去下路<\/strong>，拿河蟹/兵线/野区小资源<\/li><li>对面法师去下 → <strong>我去上路<\/strong>，同理<\/li><li>完全看不出方向 → 不动，塔后过线<\/li><li><strong>反例<\/strong>：「对面法师去支援了，我赶紧跟过去」——你没有线权，走过去比他慢 5 秒以上，到了正好接他一套技能，还把中线白送。<strong>尾随强势法师作用不大，不如反方向拿资源。<\/strong><\/li><li><strong>依赖<\/strong>：依赖 <a class=\"kref\" href=\"#K-D02\">K-D02<\/a>（先要能安全过线）<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 00:38；BV15EJk6fEwX @ 00:41<\/li><li><strong>可信度<\/strong>：高（全局思路复盘，非剪辑集锦；与《一野二边三射四中》的开局逻辑一致）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45（2026-09-23 起）；"}, {"id": "K-D02", "cat": "D", "title": "没线权时的过线方式：塔后过，不打信号就完事", "self": "<h3><a class=\"kref\" href=\"#K-D02\">K-D02<\/a> 没线权时的过线方式：塔后过，不打信号就完事<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：判定为无线权状态，且需要继续吃中线经济<\/li><li><strong>判断依据<\/strong>：对面法师的消耗距离；我方塔的血量<\/li><li><strong>决策分支<\/strong>：<\/li><li>站在<strong>塔后<\/strong>过线（不是塔前补刀），同时观察对面法师动向<\/li><li>给边路打信号，说明\"我这路被压，你们注意对面中单可能来\"<\/li><li><strong>反例<\/strong>：「我打个信号让队友别打就行了」——这条被明确否掉了：对面法师+打野一起进你们野区，或者四包二越你们下路，一个信号拦不住。<strong>打信号不能替代你到场<\/strong>。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 01:03；BV15EJk6fEwX @ 01:10<\/li><li><strong>可信度<\/strong>：高<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45触发条件：判定为无线权状态，且需要继续吃中线经济判断依据：对面法师的消耗距离；"}, {"id": "K-D03", "cat": "D", "title": "血线被打到 60% 以下且没闪现——回家，别保线", "self": "<h3><a class=\"kref\" href=\"#K-D03\">K-D03<\/a> 血线被打到 60% 以下且没闪现——回家，别保线<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：中路对线期，血量 &lt;60%，闪现已交或在冷却<\/li><li><strong>判断依据<\/strong>：对面法师的技能冷却与斩杀线；我方塔下是否安全<\/li><li><strong>决策分支<\/strong>：<\/li><li>直接回城，接受掉 1–2 个兵<\/li><li>若对面法师蓝量也不健康且无法越塔 → 可以再撑一波，但要站在塔后<\/li><li><strong>反例<\/strong>：「我血少但不能掉线，硬吃一波」——<strong>掉状态之后轻则被单杀、丢闪现，重则丢野区<\/strong>。这是\"为了一波兵输掉整条线\"的典型。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 00:30；BV15EJk6fEwX @ 00:31<\/li><li><strong>可信度<\/strong>：高<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45触发条件：中路对线期，血量 &lt;60%，闪现已交或在冷却判断依据：对面法师的技能冷却与斩杀线；"}, {"id": "K-D04", "cat": "D", "title": "有线权但下一波兵 8 秒内到——别走，再推一波", "self": "<h3><a class=\"kref\" href=\"#K-D04\">K-D04<\/a> 有线权但下一波兵 8 秒内到——别走，再推一波<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：有明确线权；下一波兵线到线时间 ≤8 秒<\/li><li><strong>判断依据<\/strong>：兵线节奏（约 30 秒一波）；当前小兵数量<\/li><li><strong>决策分支<\/strong>：留在线上再推一波，把兵线送进对面塔，让对面疲于补塔刀<\/li><li><strong>反例<\/strong>：「有线权就立刻游走」——走到一半兵线回来，你既没拿到资源也没吃到线，两头空。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 00:53<\/li><li><strong>可信度<\/strong>：中（阈值为 8 秒的推算值，UP 主未给具体秒数，需实战校准）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45触发条件：有明确线权；"}, {"id": "K-D05", "cat": "D", "title": "有线权且打野在同侧——跟他走，别自己单走", "self": "<h3><a class=\"kref\" href=\"#K-D05\">K-D05<\/a> 有线权且打野在同侧——跟他走，别自己单走<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：有线权；我方打野位于己方半区或河道<\/li><li><strong>判断依据<\/strong>：打野位置与行进方向；对面打野是否已在小地图暴露<\/li><li><strong>决策分支<\/strong>：与打野走同一侧，做视野或反野；两人一起才有交换价值<\/li><li><strong>反例<\/strong>：「我自己先去探一下」——单人进野区在无视野情况下大概率被抓，而这次被抓会把刚拿到的线权一起吐出去。<\/li><li><strong>依赖<\/strong>：依赖 <a class=\"kref\" href=\"#K-D04\">K-D04<\/a>（先确认可动窗口）<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 02:11；BV15EJk6fEwX @ 02:14<\/li><li><strong>可信度<\/strong>：中高<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45触发条件：有线权；"}, {"id": "K-D06", "cat": "D", "title": "打野位置不明——只占中轴草，不深入", "self": "<h3><a class=\"kref\" href=\"#K-D06\">K-D06<\/a> 打野位置不明——只占中轴草，不深入<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：有线权，但打野位置未知或在对面上半区<\/li><li><strong>判断依据<\/strong>：小地图打野最后出现位置与时间<\/li><li><strong>决策分支<\/strong>：站在中路两侧草丛占视野（UP 主原话\"一般是站在这个草\"），只做视野不进场<\/li><li><strong>反例<\/strong>：「反正有线权，去对面野区找个机会」——打野位置不明时进对面野区，等于把命交给概率。<\/li><li><strong>依赖<\/strong>：依赖 <a class=\"kref\" href=\"#K-D04\">K-D04<\/a><\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 01:43；BV15EJk6fEwX @ 01:47<\/li><li><strong>可信度<\/strong>：中高<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45触发条件：有线权，但打野位置未知或在对面上半区判断依据：小地图打野最后出现位置与时间决策分支：站在中路两侧草丛占视野（UP 主原话\"一般是站在这个草\"），只做视野不进场反例：「…"}, {"id": "K-D07", "cat": "D", "title": "死了刚复活——先回中线过线，不要先参团", "self": "<h3><a class=\"kref\" href=\"#K-D07\">K-D07<\/a> 死了刚复活——先回中线过线，不要先参团<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45<\/li><li><strong>触发条件<\/strong>：复活后场上正在发生团战或资源争夺<\/li><li><strong>判断依据<\/strong>：兵线位置；团战距离；自身大招冷却<\/li><li><strong>决策分支<\/strong>：<\/li><li>中线有兵且没人清 → <strong>先过线<\/strong>，再决定是否进场<\/li><li>中线已空 → 直接进场<\/li><li><strong>反例<\/strong>：「团战开始了必须去」——线不过，你到场也是白给经济，而且下一波还要被压。<strong>兵线大于团战<\/strong>这条在低分段尤其反直觉。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV15EJk6fEwX @ 03:24；BV15EJk6fEwX @ 03:26<\/li><li><strong>可信度<\/strong>：中（\"兵线大于团战\"是 UP 主的口号式结论，需在 06/07 用其他来源交叉验证）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>", "sum": "适用版本：S45触发条件：复活后场上正在发生团战或资源争夺判断依据：兵线位置；"}, {"id": "K-D08", "cat": "D", "title": "对线期的辅助：按「野→边→射→中」的顺序决定第一步", "self": "<h3><a class=\"kref\" href=\"#K-D08\">K-D08<\/a> 对线期的辅助：按「野→边→射→中」的顺序决定第一步<\/h3>", "html": "<ul><li><strong>适用版本<\/strong>：S45（中野辅版本）<\/li><li><strong>触发条件<\/strong>：开局到 1 分钟，辅助决定第一波去哪<\/li><li><strong>判断依据<\/strong>：① 我方打野是否要进攻/防守野区 ② 边路是否有线权可拿 ③ 发育路对线强度 ④ 中路是否需要帮清<\/li><li><strong>决策分支<\/strong>：<\/li><li>打野要偷野 → 去<strong>对抗路<\/strong>拿线权，再协同进野区<\/li><li>打野不偷野 → 去边路尝试一血<\/li><li>都不成立 → 回中帮清线<\/li><li><strong>反例<\/strong>：「辅助就该跟着射手」——这是四个判据里排第三的一条，不是第一条。开局直接去发育路，等于放弃了野区节奏。<\/li><li><strong>依赖<\/strong>：无<\/li><li><strong>来源<\/strong>：BV1yke26fEYB @ 00:47；BV1yke26fEYB @ 00:52<\/li><li><strong>可信度<\/strong>：中（该公式为 UP 主自创命名\"一野二边三射四中\"，非官方；顺序逻辑与 <a class=\"kref\" href=\"#K-D01\">K-D01<\/a> 的反方向拿资源一致，故采信）<\/li><li><strong>状态<\/strong>：active<\/li><\/ul>\n<h2>5. 本节的连锁错误（按节点挂，不单列）<\/h2>\n<ul><li><strong>在节点「判据 A 线权」上<\/strong>：把\"我先到 2 级\"当成\"我有线权\"。到 2 级只是一次，线权是持续状态，看的是<strong>这一波谁的小兵更多<\/strong>。<\/li><li><strong>在节点「判据 A1 对面法师消失」上<\/strong>：把\"小地图没有他\"当成\"他走了\"。消失 8 秒内可能只是在草丛里，直接跟过去会撞脸。<\/li><li><strong>在节点「判据 C 打野位置」上<\/strong>：把\"打野刚露头\"当成\"打野在附近\"。露头的位置决定他能不能到，不能到就等于不在。<\/li><li><strong>在节点「判据 D 刚复活」上<\/strong>：默认\"团战优先级最高\"。低分段最常见的死法就是复活后直奔团战，回来发现自己中线已经掉两波。<\/li><\/ul>\n<h2>6. 待验证 / 冲突<\/h2>\n<ul><li><a class=\"kref\" href=\"#K-D04\">K-D04<\/a> 的 8 秒阈值、<a class=\"kref\" href=\"#K-D07\">K-D07<\/a> 的\"兵线大于团战\"均为单一来源，缺第二个 UP 主交叉验证 → <code>30_index/stale.md<\/code> 已登记。<\/li><li>本节的\"线权\"定义在中路成立，<strong>对抗路不适用<\/strong>（对抗路优势要控线，中路优势要推线）→ 对抗路支线待 P2 单独写，不要套用本节。<\/li><li>版本风险：王维为 S45 新英雄，若 S46 调整其一级强度，<a class=\"kref\" href=\"#K-D02\">K-D02<\/a> 的\"塔后过线\"前提需重估。<\/li><\/ul>", "sum": "适用版本：S45（中野辅版本）触发条件：开局到 1 分钟，辅助决定第一波去哪判断依据：① 我方打野是否要进攻/防守野区 ② 边路是否有线权可拿 ③ 发育路对线强度 ④ 中路是否需要帮清决策分支…"}]}], "cats": [{"key": "A", "name": "英雄教学", "desc": "这个英雄怎么玩、什么时候强", "n": 4}, {"key": "B", "name": "克制关系", "desc": "打谁舒服、被谁克、为什么", "n": 3}, {"key": "C", "name": "BP", "desc": "选人阶段该怎么定", "n": 0}, {"key": "D", "name": "对局内", "desc": "现在这一刻该干什么", "n": 8}], "overview": [{"title": "导航：四类内容，四种问法", "file": "00_导航.md", "html": "<p>知识库按<strong>内容类型<\/strong>分四类。先判断你问的是哪一类，再去那一类找。<\/p>\n<div class=\"tw\"><table><thead><tr><th>类<\/th><th>你问的是<\/th><th>目录<\/th><th>编号<\/th><th>状态<\/th><\/tr><\/thead><tbody><tr><td><strong>A 英雄教学<\/strong><\/td><td>\"这个英雄怎么玩\"<\/td><td><code>A_英雄教学/<\/code><\/td><td><code>K-Axx<\/code><\/td><td>苏烈 ✅<\/td><\/tr><tr><td><strong>B 克制关系<\/strong><\/td><td>\"打谁舒服、被谁克\"<\/td><td><code>B_克制关系/<\/code><\/td><td><code>K-Bxx<\/code><\/td><td>苏烈 ✅<\/td><\/tr><tr><td><strong>C BP<\/strong><\/td><td>\"选人阶段该怎么定\"<\/td><td><code>C_BP/<\/code><\/td><td><code>K-Cxx<\/code><\/td><td>⚠️ 骨架，无实证<\/td><\/tr><tr><td><strong>D 对局内<\/strong><\/td><td>\"现在这一刻该干什么\"<\/td><td><code>D_对局内/<\/code><\/td><td><code>K-Dxx<\/code><\/td><td>04 对线期 ✅<\/td><\/tr><\/tbody><\/table><\/div>\n<h2>四类的边界（别混）<\/h2>\n<ul><li><strong>A 讲\"这个英雄\"<\/strong>：机制、连招顺序、强势期、废的时候。<strong>不涉及对面是谁<\/strong>。<\/li><li><strong>B 讲\"两个英雄之间\"<\/strong>：必须有具体对手。同一条结论换个对手就不成立，才叫克制。<\/li><li><strong>C 讲\"选人之前\"<\/strong>：只跟阵容和版本有关，不跟具体对局局势有关。<\/li><li><strong>D 讲\"选人之后\"<\/strong>：必须带时间点（0:45 / 4 分钟 / 10 分钟），不带时间点的不是 D 类。<\/li><\/ul>\n<p><strong>判定口诀<\/strong>：结论里出现\"对面是谁\"→ B；出现\"第几分钟\"→ D；只是\"这英雄\"→ A；只是\"这版本/这阵容\"→ C。<\/p>\n<h2>两条跨类的用法<\/h2>\n<ol><li><strong>A 和 B 是配套的<\/strong>：A 告诉你这英雄靠什么强，B 告诉你这个\"靠什么\"在谁面前失效。只看 A 不看 B，会在被克的对局里越打越崩。<\/li><li><strong>C 的输出是 D 的输入<\/strong>：BP 定了你能干什么，D 才谈得上\"这一刻该不该动\"。<\/li><\/ol>\n<h2>全库底层判据（压过所有技巧性结论）<\/h2>\n<p><strong>判断\"能不能打\"，看的是「战斗力差 × 能不能及时到达」，不是经济差。<\/strong><\/p>\n<p>经济差只是战斗力差的一种来源。信息不足时，先问\"我到得了吗\"，再问\"我打得过吗\"。 来源：<code>BV1i2n96AEvp @ 02:31<\/code>。<\/p>\n<h2>读法<\/h2>\n<ol><li>先按上表定位到类，再看那类的 <code>_说明.md<\/code> 了解它回答什么；<\/li><li>只读命中的那一条，<strong>不要通读<\/strong>；<\/li><li>条目里的「反例」比「结论」值钱——那是别人踩过的坑。<\/li><\/ol>"}, {"title": "教学信源名单（S45 实测，2026-10-31）", "file": "95_信源名单.md", "html": "<blockquote><p>这不是「关注列表」，是<strong>取用列表<\/strong>。按问题去取，不要全订。 名单会随赛季变，每 2 周复核一次（看 S45 更新数与平均时长有没有掉）。<\/p><\/blockquote>\n<hr>\n<h2>一、先定判据：凭什么说一个 UP「值得信任」<\/h2>\n<p>信任不来自粉丝量、也不来自播放量。按下面五条打分，缺两条以上就不进名单。<\/p>\n<div class=\"tw\"><table><thead><tr><th>#<\/th><th>判据<\/th><th>怎么验<\/th><th>反例特征<\/th><\/tr><\/thead><tbody><tr><td>1<\/td><td><strong>给判据，不给结论<\/strong><\/td><td>句子结构里有没有「如果/只要/除非/当…时」<\/td><td>全程「视情况而定」「看你怎么玩」<\/td><\/tr><tr><td>2<\/td><td><strong>讲机制，不只讲操作<\/strong><\/td><td>有没有「因为…所以」「原因是」，能不能解释<strong>为什么<\/strong>这样打<\/td><td>「记住这个连招就行」<\/td><\/tr><tr><td>3<\/td><td><strong>给可执行的阈值<\/strong><\/td><td>有没有秒数、经济差、码数、身位、次数<\/td><td>「差不多」「差一点」<\/td><\/tr><tr><td>4<\/td><td><strong>版本对得上<\/strong><\/td><td>标题/内容里的赛季号是否为当前 S45；S44 及更早当作过期<\/td><td>「S43 上路必看」今天还挂首页<\/td><\/tr><tr><td>5<\/td><td><strong>自证 + 不夹带<\/strong><\/td><td>有没有段位/国服/职业教练身份；签名里有没有「包标/上星/复盘××元」<\/td><td>全靠嘴说「我是国服」，且每条视频都在卖课<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>这五条怎么量化<\/strong>：本次实测是把候选人的视频字幕抓下来，统计 条件句密度、因果句密度、数字密度、机制术语浓度、空话密度（无脑/记住就行）， 用样本内百分位合成质量分。播放量只占 5% 权重。<\/p>\n<p><strong>实测发现（值得记住）<\/strong>：<\/p>\n<ul><li>B 站「王者荣耀教学」关键词下，<strong>结构化解说型账号极少<\/strong>，高播放大多是直播切片、<\/li><\/ul>\n<p>实录、对喷、或流水线卖课。<\/p>\n<ul><li>抓了 26 个候选、约 100 条视频字幕，只有 <strong>10 个<\/strong>满足「至少 2 条字幕是人在讲而不是<\/li><\/ul>\n<p>游戏音效」。很多号的字幕轨全是「技能正在冷却」「请求集合」——那是 ASR 把游戏音效 当成说话转录了。<\/p>\n<ul><li>所以：<strong>字幕干净本身就是个质量信号<\/strong>，说明有旁白、有解说意图。<\/li><\/ul>\n<hr>\n<h2>二、S 档：跟着学「判断依据」（讲得清、还在更）<\/h2>\n<div class=\"tw\"><table><thead><tr><th>账号<\/th><th>mid<\/th><th>方向<\/th><th>为什么进 S<\/th><th>要打折扣的地方<\/th><\/tr><\/thead><tbody><tr><td><strong>王者荣耀晚风风<\/strong><\/td><td>481626368<\/td><td>打野·全局<\/td><td>视野与节奏讲成可执行步骤：「利用视野开节奏的两个关键点」；老虎那期给到 3 分 15 秒刷新交汇、7 分钟两倍经济差。术语浓度全场最高<\/td><td>均长仅 5.8 分钟，信息密度高但要反复看；签名有「wx 上星/商务」，业务与内容分开看<\/td><\/tr><tr><td><strong>白菜打野教学<\/strong><\/td><td>67244546<\/td><td>打野·分段突破<\/td><td>因果句密度全场最高，明确讲「你卡在 1900–2100 是因为前 4 分钟」，直接对着一个分段改动作<\/td><td>营销话术重（封神/反复观看）；卖复盘 88/次，注意把「他的服务」和「他说的方法」分开<\/td><\/tr><tr><td><strong>阿泽干货博主<\/strong><\/td><td>322640745<\/td><td>全英雄·国服共创<\/td><td>请国一/2w1 分玩家共创，给的是节点型判据：4 分钟圣杯、10 分钟三件套、10 分钟分均 6800 经济<\/td><td>他也做英雄联盟内容（样本里混进过 369 兰博），<strong>只取王者分区<\/strong><\/td><\/tr><\/tbody><\/table><\/div>\n<h2>三、A 档：单点很硬，按需取（不追全部，只取自己那一路）<\/h2>\n<div class=\"tw\"><table><thead><tr><th>账号<\/th><th>mid<\/th><th>方向<\/th><th>取什么<\/th><\/tr><\/thead><tbody><tr><td><strong>益达兄弟辅助教学<\/strong><\/td><td>298590209<\/td><td>辅助<\/td><td>巅峰最高 2667、总榜第五。出装判据实用（极影 vs 近卫按对面强度与阵容选），九大神辅系列可当辅助入门骨架<\/td><\/tr><tr><td><strong>老杨国服嫦娥<\/strong><\/td><td>1866098100<\/td><td>中路·嫦娥<\/td><td>目标置换讲得清楚：「这波不追求杀人，追求打掉状态、拖刘备到四」——这正是中路该有的思路。吐槽类视频跳过<\/td><\/tr><tr><td><strong>奥特曼zz国一刘备凯<\/strong><\/td><td>18909338<\/td><td>打野·刘备<\/td><td>实战细节密度高（记对面闪现、卡视野蹲人）。签名有上分业务，只取内容<\/td><\/tr><tr><td><strong>夜昧<\/strong><\/td><td>49993700<\/td><td>对抗路<\/td><td>粉丝少但讲得实在：对抗路稳线优先、宁可打不过也别被带节奏；马超存枪的版本差异<\/td><\/tr><\/tbody><\/table><\/div>\n<blockquote><p>A 档的共同限制：<strong>覆盖窄<\/strong>。他们只对自己那一路负责，别拿打野的节奏逻辑去套中路。<\/p><\/blockquote>\n<h2>四、B 档：直播切片与职业选手（学操作与节奏，不学结论）<\/h2>\n<p>你说了切片也看，那这里要分清<strong>看什么<\/strong>：<\/p>\n<blockquote><p>切片天然删掉前提，只留结果。所以切片能用来<strong>验证你已经有的判断<\/strong>， 不能用来<strong>建立判断<\/strong>。看的时候问自己「他为什么这时候上」，而不是记「他这时候上了」。<\/p><\/blockquote>\n<div class=\"tw\"><table><thead><tr><th>账号<\/th><th>mid<\/th><th>类型<\/th><th>用法<\/th><\/tr><\/thead><tbody><tr><td><strong>赖神无所畏惧<\/strong><\/td><td>395931838<\/td><td>大主播·对抗路（230w）<\/td><td>S45 内 21 条但均长 1.7 分钟，是切片形态。适合看对抗路的对线处理与手感，不适合学体系<\/td><\/tr><tr><td><strong>哔哩哔哩王者荣耀赛事<\/strong><\/td><td>392836434<\/td><td>官方赛事（691w）<\/td><td>S45 内 38 条、均长 55 分钟。<strong>这是 BP 与运营的唯一一手素材<\/strong>，也是我们知识库 C 类（BP）目前唯一的可靠来源<\/td><\/tr><tr><td>职业选手本人号（如 AG 超玩会老帅、LGD 教练阿泰）<\/td><td>549922787 / 492870807<\/td><td>职业/教练认证<\/td><td>账号存在且有认证，但按名字检索近期投稿命中为 0，需进空间页确认更新情况；确认后再补进名单<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>切片号的坑<\/strong>：同一选手常有好几个「XX剪辑呺」「XX精彩集锦」。实测其中一个剪辑号 的字幕轨全是歌词和英雄语音，一条讲解都没有——那种号只能当集锦看。 <strong>认准认证标识和署名，不要认名字相似。<\/strong><\/p>\n<h2>五、不进名单的（按行为特征判断，不针对具体人）<\/h2>\n<ol><li><strong>签名 = 卖课目录<\/strong>：「包标」「上星」「加入我们××教」「复盘 ×× 元」，<\/li><\/ol>\n<p>且视频平均时长 &lt; 3 分钟 → 内容被切成钩子，判断链是断的。<\/p>\n<ol><li><strong>纯剪辑号<\/strong>：无旁白、字幕只有歌词/游戏语音。<\/li><li><strong>版本漂移号<\/strong>：标题还挂着 S43/S44，或内容里说「这个版本」但无法对应到 S45。<\/li><li><strong>只讲出装不讲为什么<\/strong>：给一套铭文出装就结束，遇到阵容变化无法迁移。<\/li><\/ol>\n<hr>\n<h2>六、按你的情况排的取用顺序<\/h2>\n<p>你主中辅、在练对抗、目标荣耀。所以不要五个都订，按这个顺序取：<\/p>\n<ol><li><strong>先修判断公式<\/strong>（解决「什么时候该干什么」）<\/li><\/ol>\n<p>→ 哔哩哔哩王者荣耀赛事 的 BP 段 + 晚风风的视野与节奏。 打野视角讲的是资源与到达，中路/游走可以直接迁移。<\/p>\n<ol><li><strong>再补本分路<\/strong>（解决「我这一路怎么打」）<\/li><\/ol>\n<p>→ 益达兄弟（辅助出装判据）→ 老杨（中路目标置换）。<\/p>\n<ol><li><strong>对抗路单练<\/strong>（解决「最近在练的那条路」）<\/li><\/ol>\n<p>→ 赖神切片看对线与手感 → 夜昧看稳线逻辑。<\/p>\n<ol><li><strong>每个新学的点，立刻落成知识库格式<\/strong>：触发条件 → 判据 → 阈值 → 反例。<\/li><\/ol>\n<p>写不成这个格式，说明还没学到手，只是记住了。<\/p>\n<h2>七、复核机制<\/h2>\n<ul><li>每 2 周跑一次 <code>s0_creators.py --stage all<\/code>，看「S45 更新数」和「平均时长」。<\/li><li>更新数掉到 0 或均长掉到 3 分钟以下 → 降档（大概率转成切片/直播形态）。<\/li><li>赛季切换（11-25 切 S46）后，旧名单全部降为「待复核」，重跑一遍再定档。<\/li><\/ul>\n<hr>\n<p>_数据与脚本：<code>40_scripts/s0_creators.py<\/code>（筛选+评分）、<code>40_scripts/subs_browser.py<\/code>（字幕采集）、 <code>40_scripts/bili_api.py<\/code>（接口层）。原始结果：<code>10_sources/creators_scored.json<\/code>。_<\/p>"}, {"title": "版本变更台账", "file": "90_版本变更台账.md", "html": "<p><strong>版本真值只认官方公告，不认任何\"版本答案\"。<\/strong> 每条 K 条目都必须写\"适用版本\"，跨赛季自动进复核队列。<\/p>\n<h2>赛季区间表（2026）<\/h2>\n<div class=\"tw\"><table><thead><tr><th>赛季<\/th><th>名称<\/th><th>开始<\/th><th>结束<\/th><th>依据<\/th><\/tr><\/thead><tbody><tr><td>S42<\/td><td>神佑建木<\/td><td>2026-01-08<\/td><td>2026-04-01<\/td><td>官网公告 tid=791692<\/td><\/tr><tr><td>S43<\/td><td>陌上相逢<\/td><td>2026-04-01<\/td><td>2026-06-24<\/td><td>官网赛季公告<\/td><\/tr><tr><td>S44<\/td><td>—<\/td><td>2026-06-25<\/td><td>2026-09-23<\/td><td>官网赛季公告<\/td><\/tr><tr><td><strong>S45<\/strong><\/td><td><strong>月照长安（当前）<\/strong><\/td><td><strong>2026-09-23<\/strong><\/td><td><strong>2026-11-25<\/strong><\/td><td>官网赛季公告<\/td><\/tr><tr><td>S46<\/td><td>—<\/td><td>2026-11-25<\/td><td>—<\/td><td>官方预告（11-25 0:00–5:00 停服更新）<\/td><\/tr><\/tbody><\/table><\/div>\n<blockquote><p>注意：S45 只有约 63 天，比常规 85–95 天短。<strong>任何按\"三个月一赛季\"推算的结论都要重新核对。<\/strong><\/p><\/blockquote>\n<h2>S45 版本特征（影响内容取舍）<\/h2>\n<ul><li><strong>中野辅版本<\/strong>：打野与辅助的联动权重高于边路单带。<\/li><li>周年庆期间（10/24 前后）活动内容多、<strong>平衡性调整少<\/strong>，教学素材偏旧。<\/li><li>新英雄：王维、蚩奼、大司命、空空儿、孙权、苍、影等；<strong>刀锋宝贝仍在体验服<\/strong>。<\/li><\/ul>\n<h2>已发生的平衡调整（截至 2026-10-31）<\/h2>\n<div class=\"tw\"><table><thead><tr><th>日期<\/th><th>对象<\/th><th>改动<\/th><th>影响的知识点<\/th><\/tr><\/thead><tbody><tr><td>10-30（体验服）<\/td><td>镜<\/td><td>二技能 CD 9~7→10~8（全等级 +1s）；加速 50%→100(+20/Lv)；二技能伤害小幅上调；三技能充能 10→10~8<\/td><td>未入库（打野支线），暂记<\/td><\/tr><tr><td>10-30（体验服）<\/td><td>曜<\/td><td>三技能 CD 15~10→13.5~10<\/td><td>未入库，暂记<\/td><\/tr><tr><td>10-30（体验服）<\/td><td>刀锋宝贝<\/td><td>三技能追踪优化、强化普攻法球修复<\/td><td>未上线正式服，不采信为正式结论<\/td><\/tr><\/tbody><\/table><\/div>\n<p><strong>体验服改动一律不作为正式服结论入库<\/strong>，只能进本表。<\/p>\n<h2>待办<\/h2>\n<ul><li>[ ] 抓到 S45 官方更新公告原文后，补全本表 9-23 至 10-31 的正式服调整<\/li><li>[ ] S46（11-25）上线后 7 天内，全库过一遍\"适用版本 = S45\"的条目<\/li><\/ul>"}], "meta": {"total": 15, "heroes": 2, "sub": "当前版本 S45 · 共 15 条 · 更新 2026-10-31"}}</script>
 <script>
 /* ══════════════════════════════════════════════════════════
-   kog 站点交互
+   kog 站点交互 —— 英雄宫格 + 折叠卡
    数据来自 <script id="DATA" type="application/json">，构建时注入
-   路由用 hash：#K-B01 / #doc:xx.md / #cat:A —— 因为要能 file:// 直接打开
+   路由用 hash（要支持 file:// 直接打开，不能用 History API）：
+     # / 空        → 英雄宫格
+     #H:苏烈       → 英雄页
+     #doc:xx.md    → 长文档（信源名单 / 版本台账 / 导航）
+     #cat:A        → 某一类的全部条目
+     #K-B01        → 直达条目并展开
    ══════════════════════════════════════════════════════════ */
 (function () {
   const D = JSON.parse(document.getElementById('DATA').textContent);
   const view = document.getElementById('view');
-  const nav = document.getElementById('nav');
-  const crumb = document.getElementById('crumb');
-  const res = document.getElementById('res');
-  const q = document.getElementById('q');
-  const side = document.getElementById('side');
-  const mask = document.getElementById('mask');
+  const qEl = document.getElementById('q');
   const root = document.documentElement;
 
-  /* 扁平索引：搜索用 */
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  /* ── 扁平分索引：搜索与直达用 ── */
   const IDX = [];
-  D.cats.forEach(c => c.docs.forEach(d => d.entries.forEach(e => {
-    IDX.push({ id: e.id, cat: c.key, cname: c.name, doc: d.title, title: e.title, file: d.file });
-  })));
+  D.heroes.forEach(h => {
+    h.a.concat(h.b).forEach(e => IDX.push({ ...e, owner: h.name, kind: 'H:' + h.name }));
+  });
+  D.general.forEach(g => g.entries.forEach(e =>
+    IDX.push({ ...e, owner: g.title, kind: 'doc:' + g.file })));
 
-  document.getElementById('subline').textContent = D.meta.sub;
-  document.getElementById('foot').innerHTML = '<p>' + D.meta.foot + '</p>';
+  const heroOf = n => D.heroes.find(h => h.name === n);
+  const byId = id => IDX.find(e => e.id === id);
 
-  /* ─────────── 侧栏 ─────────── */
-  (function buildNav() {
-    let h = '<div class="grp"><button class="gh"><span class="k">·</span>总览</button><ul>';
-    D.overview.forEach(o => { h += '<li><a href="#doc:' + o.file + '">' + o.title + '</a></li>'; });
-    h += '</ul></div>';
+  /* ── 条目折叠卡 ── */
+  function entryCard(e, open) {
+    return `<details class="entry" id="${esc(e.id)}"${open ? ' open' : ''}>
+      <summary>
+        <span class="id">${esc(e.id)}</span>
+        <span class="tt"><b>${esc(e.title)}</b>
+          <span>${esc(e.sum || '')}</span></span>
+        <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </summary>
+      <div class="body">${e.html || ''}</div>
+    </details>`;
+  }
 
-    D.cats.forEach(c => {
-      const n = c.docs.reduce((s, d) => s + d.entries.length, 0);
-      h += '<div class="grp"><button class="gh"><span class="k">' + c.key + '</span>' +
-        c.name + '<span class="n">' + n + '</span></button><ul>';
-      h += '<li><a href="#cat:' + c.key + '">类说明</a></li>';
-      c.docs.forEach(d => {
-        h += '<li><a href="#doc:' + d.file + '">' + d.title + '</a></li>';
-        d.entries.forEach(e => {
-          h += '<li class="sub-item"><a href="#' + e.id + '"><code>' + e.id + '</code>' +
-            esc(e.title) + '</a></li>';
-        });
-      });
-      h += '</ul></div>';
-    });
-    nav.innerHTML = h;
-  })();
+  /* ── 英雄卡 ── */
+  function heroCard(h) {
+    const pills = [];
+    if (h.a.length) pills.push(`<span class="pill a">怎么玩 ${h.a.length}</span>`);
+    if (h.b.length) pills.push(`<span class="pill b">对位 ${h.b.length}</span>`);
+    if (!pills.length) pills.push('<span class="pill g">待补</span>');
+    return `<a class="hcard" href="#H:${encodeURIComponent(h.name)}">
+      <span class="avatar" style="--h:${h.hue}">${esc(h.name.slice(0, 1))}</span>
+      <span class="hname">${esc(h.name)}</span>
+      <span class="hmeta">${pills.join('')}</span>
+    </a>`;
+  }
 
-  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  /* ── 首页 ── */
+  function renderHome() {
+    const heroes = D.heroes.map(heroCard).join('');
+    const gen = D.general.filter(g => g.entries.length || g.intro).map(g => {
+      const icon = g.key === 'D' ? '⌁' : g.key === 'C' ? '⇄' : '·';
+      const n = g.entries.length;
+      return `<a class="gcard" href="#doc:${encodeURIComponent(g.file)}">
+        <span class="gicon">${icon}</span>
+        <span class="gtxt"><b>${esc(g.title)}</b>
+          <span>${esc(g.cat)} · ${n ? n + ' 条判断' : '阅读'}</span></span>
+      </a>`;
+    }).join('');
 
-  /* ─────────── 渲染 ─────────── */
-  function renderDoc(cat, doc) {
-    let h = '<div class="doc"><h1>' + esc(doc.title) + '</h1>' + (doc.intro || '') + '</div>';
-    if (doc.entries.length) {
-      h += '<div class="doc">';
-      doc.entries.forEach(e => {
-        h += '<div class="card" id="' + e.id + '">' + e.self + e.html + '</div>';
-      });
-      h += '</div>';
+    const docs = D.overview.filter(o => o.file !== '00_导航.md').map(o =>
+      `<a class="gcard" href="#doc:${encodeURIComponent(o.file)}">
+        <span class="gicon">▤</span>
+        <span class="gtxt"><b>${esc(o.title.replace(/（.*?）/, ''))}</b>
+          <span>参考文档</span></span>
+      </a>`).join('');
+
+    view.innerHTML = `
+      <div class="hero-head">
+        <p class="eyebrow">${esc(D.version)} · 决策手册</p>
+        <h1>点英雄，看怎么打</h1>
+        <p class="lede">每一条结论都能回溯到具体视频与秒数。有判据才写，没把握就留空。</p>
+      </div>
+
+      <section class="sec">
+        <div class="sec-h"><h2>英雄</h2><span>${D.heroes.length} 个 · 点开看全部</span></div>
+        <div class="grid">${heroes}</div>
+      </section>
+
+      ${gen ? `<section class="sec">
+        <div class="sec-h"><h2>不挑英雄的</h2><span>对线、节奏、BP</span></div>
+        <div class="row">${gen}</div>
+      </section>` : ''}
+
+      ${docs ? `<section class="sec">
+        <div class="sec-h"><h2>参考</h2></div>
+        <div class="row">${docs}</div>
+      </section>` : ''}
+    `;
+  }
+
+  /* ── 英雄页 ── */
+  function renderHero(name) {
+    const h = heroOf(name);
+    if (!h) return renderHome();
+
+    const secA = h.a.length
+      ? `<section class="sec"><div class="sec-h"><h2>怎么玩</h2>
+           <span>${h.a.length} 条</span></div>
+           ${h.a.map(e => entryCard(e, false)).join('')}</section>`
+      : `<section class="sec"><div class="sec-h"><h2>怎么玩</h2></div>
+           <p class="lede">还没有这个英雄的条目。</p></section>`;
+
+    const secB = h.b.length
+      ? `<section class="sec"><div class="sec-h"><h2>打谁 / 被谁克</h2>
+           <span>${h.b.length} 条</span></div>
+           ${h.b.map(e => entryCard(e, false)).join('')}</section>`
+      : '';
+
+    const inc = h.incoming.length
+      ? `<section class="sec"><div class="sec-h"><h2>被这些英雄的条目点名</h2></div>
+           <p class="lede">${h.incoming.map(n =>
+             `<a href="#H:${encodeURIComponent(n)}">${esc(n)}</a>`).join('、')}
+           的克制条目里提到了他，点进去看具体打法。</p></section>`
+      : '';
+
+    view.innerHTML = `
+      <a class="back" href="#">← 全部英雄</a>
+      <div class="hhead">
+        <span class="avatar" style="--h:${h.hue}">${esc(h.name.slice(0, 1))}</span>
+        <div>
+          <h1>${esc(h.name)}</h1>
+          <div class="hmeta">
+            <span class="pill g">${h.n} 条</span>
+            ${h.b_n ? `<span class="pill b">对位 ${h.b_n}</span>` : ''}
+          </div>
+        </div>
+      </div>
+      ${secA}${secB}${inc}
+    `;
+  }
+
+  /* ── 长文档页 ── */
+  function renderDoc(file) {
+    const o = D.overview.find(x => x.file === file);
+    const g = D.general.find(x => x.file === file);
+    if (o) {
+      view.innerHTML = `<a class="back" href="#">← 返回</a>
+        <div class="doc">${o.html}</div>`;
+      return;
     }
-    crumb.textContent = cat.name + ' / ' + doc.title;
-    view.innerHTML = h;
+    if (g) {
+      view.innerHTML = `<a class="back" href="#">← 返回</a>
+        <div class="hero-head"><p class="eyebrow">${esc(g.cat)}</p>
+          <h1>${esc(g.title)}</h1></div>
+        <div class="doc">${g.intro || ''}</div>
+        ${g.entries.map(e => entryCard(e, false)).join('')}`;
+      return;
+    }
+    renderHome();
   }
 
-  function renderCat(c) {
-    let h = '<div class="doc"><h1>' + c.key + ' 类 · ' + esc(c.name) + '</h1><p>' + esc(c.desc) + '</p>';
-    if (c.about) h += '<div class="about">' + c.about + '</div>';
-    h += '</div>';
-    crumb.textContent = c.name;
-    view.innerHTML = h;
+  /* ── 分类页 ── */
+  function renderCat(key) {
+    const c = D.cats.find(x => x.key === key);
+    if (!c) return renderHome();
+    const list = IDX.filter(e => e.cat === key);
+    view.innerHTML = `<a class="back" href="#">← 返回</a>
+      <div class="hero-head"><p class="eyebrow">分类</p>
+        <h1>${esc(c.name)}</h1><p class="lede">${esc(c.desc)}</p></div>
+      ${list.length ? list.map(e => entryCard(e, false)).join('')
+        : '<p class="empty">这一类还没有条目。</p>'}`;
   }
 
-  function renderOverview(o) {
-    crumb.textContent = '总览 / ' + o.title;
-    view.innerHTML = '<div class="doc">' + o.html + '</div>';
+  /* ── 搜索 ── */
+  function renderSearch(kw) {
+    const k = kw.trim().toLowerCase();
+    if (!k) return renderHome();
+    const hs = D.heroes.filter(h => h.name.toLowerCase().includes(k));
+    const es = IDX.filter(e =>
+      (e.id + e.title + (e.sum || '') + (e.opp || '')).toLowerCase().includes(k));
+
+    view.innerHTML = `
+      <div class="hero-head"><p class="eyebrow">搜索</p>
+        <h1>“${esc(kw.trim())}”</h1>
+        <p class="lede">${es.length} 条结论${hs.length ? ` · ${hs.length} 个英雄` : ''}</p></div>
+      ${hs.length ? `<section class="sec"><div class="sec-h"><h2>英雄</h2></div>
+        <div class="grid">${hs.map(heroCard).join('')}</div></section>` : ''}
+      ${es.length ? `<section class="sec"><div class="sec-h"><h2>结论</h2></div>
+        ${es.map(e => entryCard(e, true)).join('')}</section>`
+        : '<p class="empty">没有命中。换个词试试，比如英雄名或「对线」。</p>'}`;
   }
 
-  function findByFile(f) {
-    for (const c of D.cats) for (const d of c.docs) if (d.file === f) return { c, d };
-    return null;
-  }
-  function findEntry(id) {
-    for (const c of D.cats) for (const d of c.docs) for (const e of d.entries)
-      if (e.id === id) return { c, d, e };
-    return null;
-  }
-
-  /* ─────────── 路由 ─────────── */
+  /* ── 路由 ── */
   function route() {
     const h = decodeURIComponent(location.hash.slice(1));
-    if (!h) { renderOverview(D.overview[0]); setActive(null); return; }
-
-    if (h.startsWith('cat:')) {
-      const c = D.cats.find(x => x.key === h.slice(4));
-      if (c) { renderCat(c); setActive(location.hash); }
-      return;
-    }
-    if (h.startsWith('doc:')) {
-      const hit = findByFile(h.slice(4));
-      if (hit) { renderDoc(hit.c, hit.d); setActive(location.hash); return; }
-      const o = D.overview.find(x => x.file === h.slice(4));
-      if (o) { renderOverview(o); setActive(location.hash); }
-      return;
-    }
-    const e = findEntry(h);
+    qEl.value = '';
+    if (!h) return renderHome();
+    if (h.startsWith('H:')) return renderHero(h.slice(2));
+    if (h.startsWith('doc:')) return renderDoc(h.slice(4));
+    if (h.startsWith('cat:')) return renderCat(h.slice(4));
+    const e = byId(h);
     if (e) {
-      renderDoc(e.c, e.d);
-      setActive('#' + h);
+      if (e.kind.startsWith('H:')) renderHero(e.kind.slice(2));
+      else renderDoc(e.kind.slice(4));
       requestAnimationFrame(() => {
         const el = document.getElementById(h);
         if (el) {
-          el.scrollIntoView({ block: 'start' });
-          el.classList.add('flash');
-          setTimeout(() => el.classList.remove('flash'), 1700);
+          el.open = true;
+          el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          el.querySelector('summary').style.background = 'var(--bg3)';
+          setTimeout(() => { el.querySelector('summary').style.background = ''; }, 1600);
         }
       });
+      return;
     }
+    renderHome();
   }
 
-  function setActive(hash) {
-    nav.querySelectorAll('a').forEach(a => a.classList.toggle('on', a.getAttribute('href') === hash));
-  }
-  window.addEventListener('hashchange', route);
+  /* ── 搜索交互 ── */
+  let t = null;
+  qEl.addEventListener('input', () => {
+    clearTimeout(t);
+    const v = qEl.value;
+    t = setTimeout(() => {
+      if (v.trim()) renderSearch(v);
+      else if (!location.hash) renderHome();
+    }, 140);
+  });
+  qEl.addEventListener('keydown', ev => {
+    if (ev.key === 'Escape') { qEl.value = ''; route(); }
+  });
+  document.addEventListener('keydown', ev => {
+    if (ev.key === '/' && document.activeElement !== qEl) {
+      ev.preventDefault(); qEl.focus();
+    }
+  });
 
-  /* ─────────── 主题 ─────────── */
+  /* ── 主题 ── */
   const saved = localStorage.getItem('kog-theme');
   if (saved) root.dataset.theme = saved;
-  document.getElementById('theme').onclick = () => {
-    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('kog-theme', root.dataset.theme);
-  };
-
-  /* ─────────── 搜索 ─────────── */
-  function search(kw) {
-    kw = kw.trim().toLowerCase();
-    if (!kw) { res.classList.remove('on'); res.innerHTML = ''; return; }
-    const hits = IDX.filter(x =>
-      (x.id + ' ' + x.title + ' ' + x.doc + ' ' + x.cname).toLowerCase().includes(kw)
-    ).slice(0, 12);
-    res.innerHTML = hits.length
-      ? hits.map(x => '<a href="#' + x.id + '"><span class="m">' + x.id + '</span>' + esc(x.title) + '</a>').join('')
-      : '<a style="color:var(--fg3)">没有匹配的条目</a>';
-    res.classList.add('on');
-  }
-  q.addEventListener('input', e => search(e.target.value));
-  q.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { const a = res.querySelector('a[href]'); if (a) { a.click(); q.blur(); } }
-    if (e.key === 'Escape') { q.value = ''; search(''); }
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
-  });
-  document.addEventListener('click', e => {
-    if (!res.contains(e.target) && e.target !== q) res.classList.remove('on');
+  document.getElementById('theme').addEventListener('click', () => {
+    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+    root.dataset.theme = next;
+    localStorage.setItem('kog-theme', next);
   });
 
-  /* ─────────── 移动端抽屉 ─────────── */
-  document.getElementById('menu').onclick = () => {
-    side.classList.add('open'); mask.classList.add('on');
-  };
-  function closeDrawer() { side.classList.remove('open'); mask.classList.remove('on'); }
-  mask.onclick = closeDrawer;
-  nav.addEventListener('click', e => { if (e.target.closest('a')) closeDrawer(); });
-
-  /* ─────────── 回到顶部 ─────────── */
-  const bt = document.getElementById('backtop');
-  window.addEventListener('scroll', () => bt.classList.toggle('on', window.scrollY > 600), { passive: true });
-  bt.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-
+  window.addEventListener('hashchange', route);
   route();
 })();
 
