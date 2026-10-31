@@ -46,14 +46,22 @@ def load_lexicon() -> tuple[list[str], list[str]]:
 
 
 def cue_times(bvid: str) -> list[float] | None:
+    """时间锚点来源：raw/ 的原始 cues，或 creators_cache/subs 的浏览器采集结果。"""
     p = RAW / f"{bvid}.cues.json"
-    if not p.exists():
-        return None
-    try:
-        cues = json.loads(p.read_text(encoding="utf-8")).get("cues") or []
-    except Exception:
-        return None
-    return sorted(float(c.get("from", 0)) for c in cues)
+    if p.exists():
+        try:
+            cues = json.loads(p.read_text(encoding="utf-8")).get("cues") or []
+            return sorted(float(c.get("from", 0)) for c in cues)
+        except Exception:
+            return None
+    q = ROOT / "10_sources" / "creators_cache" / "subs" / f"{bvid}.json"
+    if q.exists():
+        try:
+            body = json.loads(q.read_text(encoding="utf-8")).get("body") or []
+            return sorted(float(c.get("from", 0)) for c in body)
+        except Exception:
+            return None
+    return None
 
 
 def near(ts: float, times: list[float], tol: float = TOL) -> bool:
@@ -115,21 +123,24 @@ def main() -> int:
                 status = "no_source"
                 problems.append(f"{e['id']} 无 BV 来源")
             else:
+                # 语义：每个时间戳只要能在**任一**引用视频里找到就算可溯源。
+                # 旧逻辑要求在每个视频里都有，多来源条目会被误判。
+                have: list[tuple[str, list[float]]] = []
                 for bv in bvids:
                     if bv not in cache:
                         cache[bv] = cue_times(bv)
                     times = cache[bv]
-                    if times is None:
-                        status = "unverified"
-                        continue
-                    if not times:
-                        status = "unverified"
-                        continue
+                    if times:
+                        have.append((bv, times))
+                if not have:
+                    status = "unverified"
+                else:
                     for ts in stamps:
-                        if not near(ts, times):
+                        if not any(near(ts, t) for _, t in have):
                             status = "bad_timestamp"
                             problems.append(
-                                f"{e['id']} 时间戳 {ts//60:02d}:{ts%60:02d} 在 {bv} 里找不到")
+                                f"{e['id']} 时间戳 {ts//60:02d}:{ts%60:02d} 在 "
+                                f"{'/'.join(b for b, _ in have)} 里找不到")
 
             text = e["title"] + " " + f.get("触发条件", "") + " " + f.get("判断依据", "")
             # A/B 类按英雄立卡，归属直接取文件名（正文不一定出现英雄名，靠猜会漏）
