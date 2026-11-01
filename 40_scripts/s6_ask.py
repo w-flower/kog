@@ -38,12 +38,22 @@ PHASE_HINT = {
     "逆风": "09", "翻盘": "09", "终结": "10", "推塔": "10",
 }
 
+# 分路词 → 分路名（L 类条目按文件名里的分路归属）
+LANE_WORDS = {
+    "中路": ["中路", "中单", "法师", "中线"],
+    "游走": ["游走", "辅助", "软辅", "硬辅", "保人"],
+    "发育路": ["发育路", "射手", "下路", "adc", "ADC"],
+    "对抗路": ["对抗路", "边路", "上路", "上单", "坦边"],
+    "打野": ["打野", "野区", "刷野", "反野"],
+}
+
 # 提问里的"这是哪一类问题"信号
 CAT_HINT = {
     "A": ["怎么玩", "连招", "机制", "技能", "怎么用", "上手", "玩法", "怎么出"],
     "B": ["克制", "怕谁", "打不过", "被克", "怎么打他", "对线谁", "怎么打"],
     "C": ["选谁", "ban", "BP", "bp", "阵容", "先手", "后手", "拿什么"],
     "D": ["这波", "该不该", "什么时候", "几分钟", "现在", "要不要", "压塔"],
+    "L": ["分路", "位置", "大局观", "该按什么", "第一步去哪", "我这个位置"],
 }
 
 
@@ -95,6 +105,22 @@ def score(e: dict, toks: list[str], q: str, q_heroes: set[str], hero_set: set[st
     s += 1.5 * sum(1 for t in toks
                    if len(t) == 2 and t in title and t not in hero_set)
 
+    # L 类：题里说的是哪个位置，就只该出哪个分路的条目
+    if cat == "L":
+        lane = (e.get("phase") or "").split("_")[-1]
+        hit, miss = False, False
+        for name, words in LANE_WORDS.items():
+            if not any(w in q for w in words):
+                continue
+            if name == lane:
+                hit = True
+            else:
+                miss = True
+        if hit:
+            s += 6.0
+        elif miss:
+            s -= 3.0
+
     for kw, ph in PHASE_HINT.items():
         if kw in q and e.get("phase", "").startswith(ph):
             s += 2.5
@@ -124,7 +150,7 @@ def main() -> int:
     ap.add_argument("query", nargs="?", default="")
     ap.add_argument("--top", type=int, default=3)
     ap.add_argument("--json", action="store_true")
-    ap.add_argument("--cat", default="", help="只搜某一类：A/B/C/D，逗号分隔")
+    ap.add_argument("--cat", default="", help="只搜某一类：A/B/C/D/L，逗号分隔")
     ap.add_argument("--show", action="store_true", help="打印条目全文，query 传 K-id")
     args = ap.parse_args()
 
@@ -178,7 +204,7 @@ def main() -> int:
                          ensure_ascii=False, indent=1))
         return 0
 
-    labels = {"A": "英雄", "B": "克制", "C": "BP", "D": "对局内"}
+    labels = {"A": "英雄", "B": "克制", "C": "BP", "D": "对局内", "L": "分路"}
     for h in hits:
         print(f"[{h['score']:>4}] {h['id']} {h['title']}")
         print(f"        {labels.get(h.get('cat'), '?')}类 / {h.get('path', h['file'])}"
