@@ -123,7 +123,8 @@
       <section class="sec">
         <div class="sec-h"><h2>英雄</h2>
           <span>${D.heroes.length} 个 · 点开看全部 ·
-            <a href="#matrix">对位总表 →</a></span></div>
+            <a href="#matrix">对位总表 →</a>${duelHas()
+              ? ` · <a href="#duel:${encodeURIComponent(Object.keys(D.duel)[0])}">同路五档矩阵 →</a>` : ''}</span></div>
         <div class="grid">${heroes}</div>
       </section>
 
@@ -220,7 +221,7 @@
         </div>
       </div>
       ${plan}
-      ${secK}${secA}${secB}${inc}
+      ${duelBox(h.name)}${secK}${secA}${secB}${inc}
     `;
   }
 
@@ -369,8 +370,306 @@
           官方每个英雄只给两个方向各 2~6 个例子，不是全量配对，也没给成立条件。
           要「在什么分段、什么出装下成立」，看英雄页里的 K-B 实测条目。</p>
       </div>
+      ${duelHas() ? `<section class="sec">
+        <div class="sec-h"><h2>同路五档矩阵</h2><span>只判同路，五档 + 证据三态</span></div>
+        <div class="row">${Object.keys(D.duel).map(k => {
+          const g = D.duel[k], cov = g.coverage || {};
+          return `<a class="gcard" href="#duel:${encodeURIComponent(k)}">
+            <span class="gicon">⇄</span>
+            <span class="gtxt"><b>${esc(g.cn || k)} · ${g.heroes.length} 英雄</b>
+              <span>${cov.measured || 0} 实测 / ${cov.total || 0} 格</span></span>
+          </a>`;
+        }).join('')}</div>
+      </section>` : ''}
       ${blocks}${rest}
     `;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     同路五档对位矩阵（30_index/duel/{lane}.grid.json）
+     档位：克 / 小优 / 五五开 / 小劣 / 被克
+     状态：measured 有人真讲过 · derived 有档位没实测 · empty 待补
+     数据是位置数组，每格 6 个数字，见 build_site.duel_payload
+     ══════════════════════════════════════════════════════════ */
+  const DUEL_G = ['克', '小优', '五五开', '小劣', '被克'];
+  const DUEL_SHORT = ['克', '优', '平', '劣', '被'];
+  const DUEL_S_CN = ['待补', '推演', '实测'];
+  const DUEL_LAYER = ['机制', '数值'];
+  const DUEL_CONF = ['', '低', '中', '高'];
+  const DUEL_BASIS = { column: '专栏', video: '视频',
+                       official: '官方口径', mechanism: '机制推演' };
+  const duelMode = {};
+  let curDuel = '';
+
+  const duelHas = () => !!(D.duel && Object.keys(D.duel).length);
+
+  function duelCell(g, ia, ib) {
+    const o = (ia * g.heroes.length + ib) * 6;
+    return { grade: g.flat[o], status: g.flat[o + 1], conf: g.flat[o + 2],
+             layer: g.flat[o + 3], ev: g.flat[o + 4], mirror: g.flat[o + 5] };
+  }
+
+  /* 某个英雄在这一路的所有对位 → 五个档位分桶 + 三态计数 */
+  function duelBuckets(g, name) {
+    const out = [[], [], [], [], []];
+    const st = { empty: 0, derived: 0, measured: 0 };
+    const ia = g.heroes.indexOf(name);
+    if (ia < 0) return { out, st, n: 0 };
+    g.heroes.forEach((b, ib) => {
+      if (b === name) return;
+      const c = duelCell(g, ia, ib);
+      st[['empty', 'derived', 'measured'][c.status] || 'empty']++;
+      if (c.grade >= 0) out[c.grade].push(b);
+    });
+    return { out, st, n: g.heroes.length - 1 };
+  }
+
+  /* ── 名单视图：一个英雄一行 ── */
+  function duelRow(g, name, lane) {
+    const b = duelBuckets(g, name);
+    const h = heroOf(name);
+    const groups = b.out.map((list, gi) => list.length
+      ? `<span class="dgrp"><i class="dgk g${gi}">${DUEL_G[gi]}</i>${list.map(n =>
+          `<button class="dchip g${gi}" data-lane="${esc(lane)}" data-a="${esc(name)}"
+             data-b="${esc(n)}">${esc(n)}</button>`).join('')}</span>`
+      : '').filter(Boolean).join('');
+    const stat = [
+      b.st.measured ? `<b class="dok">实测 ${b.st.measured}</b>` : '',
+      b.st.derived ? `<b class="dder">推演 ${b.st.derived}</b>` : '',
+      `<b class="demp">待补 ${b.st.empty}</b>`,
+    ].join('');
+    return `<div class="drow">
+      <a class="drow-h" href="#H:${encodeURIComponent(name)}">
+        <span class="avatar" style="--h:${h ? h.hue : 0}">${esc(name.slice(0, 1))}</span>
+        <span class="drow-n">${esc(name)}</span>
+      </a>
+      <div class="drow-b">${groups || `<i class="dim">${b.n} 个对位全部待补</i>`}</div>
+      <span class="drow-s">${stat}</span>
+    </div>`;
+  }
+
+  /* ── 网格视图：24 × 24 ── */
+  function duelGrid(g, lane) {
+    const H = g.heroes;
+    const head = `<tr><th class="dgx"></th>${H.map((b, i) =>
+      `<th><span>${esc(b)}</span></th>`).join('')}</tr>`;
+    const body = H.map((a, ia) => `<tr><th class="dgy">${esc(a)}</th>${H.map((b, ib) => {
+      if (a === b) return '<td class="dself"></td>';
+      const c = duelCell(g, ia, ib);
+      const cls = c.grade >= 0 ? `g${c.grade} s${c.status}` : 'gx';
+      const tip = `${a} vs ${b}` + (c.grade >= 0
+        ? ` · ${DUEL_G[c.grade]} · ${DUEL_S_CN[c.status]}` : ' · 待补');
+      return `<td><button class="dcell ${cls}" title="${esc(tip)}"
+        data-lane="${esc(lane)}" data-a="${esc(a)}" data-b="${esc(b)}"
+        aria-label="${esc(tip)}">${c.grade >= 0 ? DUEL_SHORT[c.grade] : ''}</button></td>`;
+    }).join('')}</tr>`).join('');
+    return `<div class="dgwrap"><table class="dgrid">
+      <thead>${head}</thead><tbody>${body}</tbody></table></div>`;
+  }
+
+  /* ── 详情弹层 ── */
+  const mmss = s => {
+    const v = Math.max(0, Math.round(Number(s) || 0));
+    return `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`;
+  };
+
+  function openDuel(lane, a, b) {
+    const g = (D.duel || {})[lane];
+    if (!g) return;
+    const ia = g.heroes.indexOf(a), ib = g.heroes.indexOf(b);
+    if (ia < 0 || ib < 0) return;
+    const c = duelCell(g, ia, ib);
+    const d = (g.detail || {})[`${a}|${b}`] || null;
+
+    const grade = c.grade >= 0
+      ? `<span class="dgrade g${c.grade}">${DUEL_G[c.grade]}</span>`
+      : `<span class="dgrade gx">待补</span>`;
+    const pills = [
+      `<span class="dpill s${c.status}">${DUEL_S_CN[c.status] || '待补'}</span>`,
+      c.layer >= 0 ? `<span class="dpill">${DUEL_LAYER[c.layer]}差距</span>` : '',
+      c.conf ? `<span class="dpill">可信度 ${DUEL_CONF[c.conf]}</span>` : '',
+      c.ev ? `<span class="dpill">${c.ev} 条证据</span>` : '',
+      d && d.basis ? `<span class="dpill">依据 ${esc(DUEL_BASIS[d.basis] || d.basis)}</span>` : '',
+    ].filter(Boolean).join('');
+
+    let note = '';
+    if (c.status === 0) {
+      note = `<p class="dnote">这一格还没有来源。官方关系页每边只列 2 个例子，
+        同路对位覆盖率不到 5%，所以大部分格是空的——不猜、不凑。</p>`;
+    } else if (c.status === 1) {
+      note = `<p class="dnote">${d && d.basis === 'official'
+        ? '官方口径只给了方向，没给强度和成立条件。这里按最保守的一档暂记，等实测覆盖。'
+        : '按机制推的，没有视频或专栏实测过。可作参考，别当结论。'}</p>`;
+    }
+    if (c.mirror) {
+      note += `<p class="dnote">这一格是反对偶：由「${esc(b)} vs ${esc(a)}」的结论取反得来，
+        打法细节在对面那条里。</p>`;
+    }
+
+    const EV_KIND = { video: '视频', column: '专栏', official: '官方关系页' };
+    const evList = (d && d.ev && d.ev.length)
+      ? d.ev.map(e => {
+          const tag = EV_KIND[e.k] || '出处';
+          const when = (e.k === 'video' || e.k === 'column') && e.ts != null
+            ? ` @ ${mmss(e.ts)}` : '';
+          // 官方口径的 ref 是站点内部的文件名，对人没意义，只留可点的官方页面
+          const tail = e.k === 'official' || !e.ref ? '' : ' · ' + esc(e.ref);
+          const src = e.url
+            ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(tag)}${tail}${when}</a>`
+            : `<span class="devsrc">${esc(tag)}${tail}</span>`;
+          return `<li>${src}${e.q ? `<q>${esc(e.q)}</q>` : ''}</li>`;
+        }).join('')
+      : '';
+
+    const sec = (t, v) => v ? `<section class="dsec"><h4>${t}</h4><p>${esc(v)}</p></section>` : '';
+    const body = `
+      <div class="dhead">
+        <div class="dvs">
+          <a href="#H:${encodeURIComponent(a)}">${esc(a)}</a>
+          <em>vs</em>
+          <a href="#H:${encodeURIComponent(b)}">${esc(b)}</a>
+        </div>
+        <button class="dclose" aria-label="关闭">×</button>
+      </div>
+      <div class="dbadges">${grade}${pills}</div>
+      ${d && d.cond ? `<p class="dcond">成立条件 · ${esc(d.cond)}</p>` : ''}
+      ${sec('怎么打', d && d.how)}
+      ${sec('他的破绽', d && d.counter)}
+      ${evList ? `<section class="dsec"><h4>出处</h4><ul class="dev">${evList}</ul></section>` : ''}
+      ${note}
+      <p class="dfoot">${esc(g.cn || '')} · 对位矩阵</p>`;
+
+    const el = duelModal();
+    el.querySelector('.dbox').innerHTML = body;
+    el.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    el.querySelector('.dclose').addEventListener('click', closeDuel);
+  }
+
+  function duelModal() {
+    let el = document.getElementById('dmodal');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'dmodal';
+    el.className = 'dmodal';
+    el.innerHTML = '<div class="dmask"></div><div class="dbox" role="dialog" aria-modal="true"></div>';
+    el.querySelector('.dmask').addEventListener('click', closeDuel);
+    document.addEventListener('keydown', ev => {
+      if (ev.key === 'Escape' && el.classList.contains('on')) closeDuel();
+    });
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function closeDuel() {
+    const el = document.getElementById('dmodal');
+    if (el) el.classList.remove('on');
+    document.body.style.overflow = '';
+  }
+
+  /* 事件委托：所有 dchip / dcell 都走这一个入口 */
+  document.addEventListener('click', ev => {
+    const t = ev.target.closest('.dchip, .dcell');
+    if (!t) return;
+    ev.preventDefault();
+    openDuel(t.dataset.lane, t.dataset.a, t.dataset.b);
+  });
+
+  /* ── 对位矩阵页 ── */
+  function renderDuel(lane, mode) {
+    const g = (D.duel || {})[lane];
+    if (!g) return renderHome();
+    curDuel = lane;
+    const m = mode || duelMode[lane] || 'list';
+    duelMode[lane] = m;
+
+    const cov = g.coverage || {};
+    const tot = cov.total || g.heroes.length * (g.heroes.length - 1);
+    const pct = x => (x || 0) / tot * 100;
+    const otherLanes = Object.keys(D.duel || {}).filter(k => k !== lane);
+
+    const legend = `<div class="dlegend">
+      <span class="dlegend-t">档位</span>
+      ${DUEL_G.map((n, i) => `<span class="dgrade g${i}">${n}</span>`).join('')}
+      <span class="dlegend-t">状态</span>
+      <span class="dpill s2">实测</span>
+      <span class="dpill s1">推演</span>
+      <span class="dpill s0">待补</span>
+    </div>`;
+
+    const listBody = m === 'list'
+      ? `<div class="dlist">${g.heroes.map(n => duelRow(g, n, lane)).join('')}</div>`
+      : duelGrid(g, lane);
+
+    view.innerHTML = `
+      <a class="back" href="#">← 返回</a>
+      <div class="hero-head">
+        <p class="eyebrow">${esc(g.version || D.version)} · 同路对位</p>
+        <h1>${esc(g.cn || lane)} · ${g.heroes.length} × ${g.heroes.length - 1} 全矩阵</h1>
+        <p class="lede">这一路<b>所有</b>英雄两两配对，谁克谁一格一格摆出来。
+          五档是判断，三态是证据强弱：<b>实测</b>有人真讲过并留了秒数，<b>推演</b>只有方向没有验证，
+          <b>待补</b>就是还没人讲。点任意一格看依据、成立条件和出处。</p>
+      </div>
+
+      <section class="sec">
+        <div class="dbar">
+          <div class="dbar-n">
+            <b>${cov.measured || 0}</b><span>实测</span>
+          </div>
+          <div class="dbar-n">
+            <b>${cov.derived || 0}</b><span>推演</span>
+          </div>
+          <div class="dbar-n">
+            <b>${cov.empty || 0}</b><span>待补</span>
+          </div>
+          <div class="dbar-b">
+            <i class="dbar-m" style="width:${pct(cov.measured)}%"></i>
+            <i class="dbar-d" style="width:${pct(cov.derived)}%"></i>
+          </div>
+          <div class="dbar-p">实测覆盖 ${pct(cov.measured).toFixed(1)}%</div>
+        </div>
+        ${legend}
+        <div class="dswitch">
+          <button class="dtab${m === 'list' ? ' on' : ''}" data-mode="list">名单</button>
+          <button class="dtab${m === 'grid' ? ' on' : ''}" data-mode="grid">网格</button>
+          <a class="dtab" href="#matrix">全英雄对位总表 →</a>
+          ${otherLanes.map(k => `<a class="dtab" href="#duel:${encodeURIComponent(k)}">${esc(D.duel[k].cn || k)}</a>`).join('')}
+        </div>
+      </section>
+
+      <section class="sec">${listBody}</section>
+
+      <p class="dnofoot">为什么这么多格是空的：官方关系页每个方向固定只列 2 个例子，
+        而且 77% 是跨路对位；同路对位要靠视频字幕与专栏逐条挖，通过率不高。
+        补齐进度记在 <a href="#doc:96_素材缺口.md">素材缺口</a>里。</p>
+    `;
+    view.querySelectorAll('.dtab[data-mode]').forEach(btn => {
+      btn.addEventListener('click', () => renderDuel(lane, btn.dataset.mode));
+    });
+  }
+
+  /* ── 英雄页上的对位块 ── */
+  function duelBox(name) {
+    if (!duelHas()) return '';
+    const lanes = Object.keys(D.duel).filter(k => D.duel[k].heroes.includes(name));
+    if (!lanes.length) return '';
+    const lane = lanes[0];
+    const g = D.duel[lane];
+    const b = duelBuckets(g, name);
+    const rows = b.out.map((list, gi) => list.length
+      ? `<div class="opprow">
+           <span class="oppk g${gi}">${DUEL_G[gi]}</span>
+           <span class="oppv">${list.map(n =>
+             `<button class="dchip g${gi}" data-lane="${esc(lane)}" data-a="${esc(name)}"
+                data-b="${esc(n)}">${esc(n)}</button>`).join('')}</span>
+         </div>`
+      : '').join('');
+    return `<section class="sec"><div class="sec-h"><h2>同路对位（${esc(g.cn || lane)}）</h2>
+        <span>实测 ${b.st.measured} · 推演 ${b.st.derived} · 待补 ${b.st.empty}</span></div>
+      ${rows ? `<div class="oppbox">${rows}</div>`
+             : `<p class="lede">这一路 ${b.n} 个对位全部待补。</p>`}
+      <p class="lede"><a href="#duel:${encodeURIComponent(lane)}">看${esc(g.cn || lane)}全矩阵 →</a></p>
+    </section>`;
   }
 
   /* ── 路由 ── */
@@ -379,6 +678,7 @@
     qEl.value = '';
     if (!h) return renderHome();
     if (h === 'matrix') return renderMatrix();
+    if (h.startsWith('duel:')) return renderDuel(h.slice(5));
     if (h.startsWith('H:')) return renderHero(h.slice(2));
     if (h.startsWith('lane:')) return renderLane(h.slice(5));
     if (h.startsWith('doc:')) return renderDoc(h.slice(4));

@@ -204,8 +204,79 @@ def hue_of(name: str) -> int:
 
 
 def parse_opp(title: str) -> str:
-    m = re.search(r"^对([\u4e00-\u9fa5]{2,4})[：:]", title)
-    return m.group(1) if m else ""
+    """「对戈娅：…」→ 戈娅。多对手标题（对A／对B）与别名交给 names 统一处理。"""
+    try:
+        sys.path.insert(0, str(ROOT / "40_scripts"))
+        import names as _names
+        return _names.opponent_of(title)
+    except Exception:
+        m = re.search(r"^对([\u4e00-\u9fa5]{2,4})[：:]", title)
+        return m.group(1) if m else ""
+
+
+# ── 同路对位矩阵（s24_duel_grid.py 产物） ──────────────────────────
+DUEL_GRADES = ["克", "小优", "五五开", "小劣", "被克"]
+DUEL_STATUS = ["empty", "derived", "measured"]
+DUEL_LAYERS = ["机制", "数值"]
+DUEL_CONF = {"": 0, "low": 1, "mid": 2, "high": 3}
+LANE_CN = {"mid": "中路", "solo": "对抗路", "jungle": "打野",
+           "adc": "发育路", "roam": "游走"}
+
+
+def duel_payload(g: dict) -> dict:
+    """把 552 格的 JSON 压成位置数组，体积从 ~600KB 降到 ~25KB。
+
+    每格 6 个数字 [档位, 状态, 可信度, 层级, 证据数, 是否镜像]，-1 = 无。
+    只有带正文的格（how/counter/ev）才进 detail，键是 "a|b"。
+    24 × 24 的遍历在前端做，一次不到 600 次循环，不用预计算。
+    """
+    heroes = g["heroes"]
+    by = {(c["a"], c["b"]): c for c in g["cells"]}
+    flat: list[int] = []
+    detail: dict[str, dict] = {}
+    for a in heroes:
+        for b in heroes:
+            c = by.get((a, b))
+            if not c:
+                flat.extend([-1, -1, -1, -1, -1, -1])
+                continue
+            grade = c.get("grade") or ""
+            flat.extend([
+                DUEL_GRADES.index(grade) if grade in DUEL_GRADES else -1,
+                DUEL_STATUS.index(c["status"]) if c.get("status") in DUEL_STATUS else -1,
+                DUEL_CONF.get(c.get("conf") or "", 0),
+                DUEL_LAYERS.index(c["layer"]) if c.get("layer") in DUEL_LAYERS else -1,
+                len(c.get("ev") or []),
+                1 if c.get("mirror_of") else 0,
+            ])
+            if c.get("how") or c.get("counter") or c.get("cond") or c.get("ev"):
+                ev = [{"k": e.get("kind", ""), "ref": e.get("ref", ""),
+                       "ts": e.get("ts"), "q": e.get("quote", ""),
+                       "url": e.get("url", "")}
+                      for e in (c.get("ev") or [])][:3]
+                detail[f"{a}|{b}"] = {
+                    "cond": c.get("cond", ""), "how": c.get("how", ""),
+                    "counter": c.get("counter", ""), "basis": c.get("basis") or "",
+                    "by": c.get("by", ""), "ev": ev,
+                }
+    return {"lane": g["lane"], "cn": g.get("lane_cn") or LANE_CN.get(g["lane"], ""),
+            "version": g.get("version", ""), "updated": g.get("updated", ""),
+            "heroes": heroes,
+            "coverage": g.get("coverage", {}),
+            "flat": flat, "detail": detail}
+
+
+def load_duel(lanes: tuple[str, ...] = ("mid",)) -> dict:
+    out = {}
+    for lane in lanes:
+        p = IDX / "duel" / f"{lane}.grid.json"
+        if not p.exists():
+            continue
+        try:
+            out[lane] = duel_payload(json.loads(p.read_text(encoding="utf-8")))
+        except (json.JSONDecodeError, KeyError, ValueError) as exc:
+            print(f"[WARN] 读不了 {p.name}：{exc}", file=sys.stderr)
+    return out
 
 
 LANE_ALIAS = {"中路": "mid", "中": "mid", "mid": "mid",
@@ -273,6 +344,10 @@ def sections_as_entries(path: Path) -> list[dict]:
             continue
         # B 类自动生成卡里的脚手架小节：不是知识点，别当条目
         if title in ("待补", "实测条目"):
+            continue
+        # 「同路对位」整块归到 #duel: 矩阵页，英雄页用 duelBox 单独渲染，
+        # 不在这里切成条目，否则同一句话会在英雄页出现两次
+        if title.startswith("同路对位"):
             continue
         html = md_to_html("\n".join(body[i + 1:end]).strip())
         if not html.strip():
@@ -436,6 +511,7 @@ def collect() -> dict:
 
     return {"version": VERSION, "heroes": hero_list, "general": general,
             "lanes": lane_list, "stages": stages, "lane_about": lane_about,
+            "duel": load_duel(),
             "cats": [{"key": c["key"], "name": c["name"], "desc": c["desc"],
                       "n": sum(len([e for e in d["entries"] if e.get("id")]) for d in c["docs"])} for c in cats],
             "overview": overview}

@@ -223,6 +223,8 @@ html[data-theme="light"] .oppchip:hover{background:#f4f6f9}
 .pb-cell.wide{min-width:0}
 .pb-k{font-size:11px;color:var(--fg3);letter-spacing:.04em}
 .pb-cell b{font-size:14.5px;font-weight:600;line-height:1.45}
+/* 大局观三栏下面紧跟的第一个 section（同路对位）要留出呼吸 */
+.planbox + .sec{margin-top:24px}
 @media (max-width:640px){
   .planbox{grid-template-columns:1fr 1fr}
   .pb-cell.wide{grid-column:1 / -1}
@@ -364,6 +366,193 @@ html[data-theme="light"] .pill.l{color:#2f5c96;border-color:#c5d7ee;background:#
   border-top:1px solid var(--line);color:var(--fg3);font-size:12.5px;
 }
 
+/* ══════════════════════════════════════════════════════════
+   同路五档对位矩阵
+   五档三重区分：颜色 + 文字（克/优/平/劣/被）+ 底纹
+   三态再区分：实测实底 / 推演 45° 斜纹 + 虚线边 / 待补极淡棋盘格
+   ══════════════════════════════════════════════════════════ */
+.g0,.g1,.g2,.g3,.g4{--gc:#f0a9a0; --gb:#3a201c; --gt:#f3c4bb}
+.g1{--gc:#e0c07a; --gb:#332a17; --gt:#eed9a8}
+.g2{--gc:#8d9aa8; --gb:#232a32; --gt:#c2ccd6}
+.g3{--gc:#93b6d6; --gb:#1a2632; --gt:#bdd2e6}
+.g4{--gc:#8fa8e0; --gb:#1b2033; --gt:#c3cdec}
+html[data-theme="light"] .g0{--gc:#a8412c; --gb:#fdeee9; --gt:#8a3623}
+html[data-theme="light"] .g1{--gc:#9a7318; --gb:#fdf6e3; --gt:#7d5c10}
+html[data-theme="light"] .g2{--gc:#5f6b78; --gb:#eef1f5; --gt:#4c5764}
+html[data-theme="light"] .g3{--gc:#2b5c86; --gb:#eef5fb; --gt:#245074}
+html[data-theme="light"] .g4{--gc:#3b4a9e; --gb:#eef0fc; --gt:#33418c}
+
+.dgrade{
+  display:inline-flex; align-items:center; gap:4px; flex:none;
+  font-size:12px; padding:1.5px 9px; border-radius:20px; line-height:1.6;
+  color:var(--gt); background:var(--gb); border:1px solid color-mix(in srgb,var(--gc) 45%,transparent);
+  white-space:nowrap;
+}
+.dgrade.gx{color:var(--fg3); background:var(--bg3); border-color:var(--line)}
+
+.dpill{
+  font-size:11.5px; padding:1.5px 8px; border-radius:20px; line-height:1.6;
+  color:var(--fg2); background:var(--bg3); border:1px solid var(--line); white-space:nowrap;
+}
+.dpill.s2{color:#8fd18a; border-color:#2f5233; background:#16241a}
+.dpill.s1{color:#e0c07a; border-color:#40351c; background:#241f10;
+  background-image:repeating-linear-gradient(45deg,transparent 0 3px,#ffffff0a 3px 6px)}
+.dpill.s0{color:var(--fg3)}
+html[data-theme="light"] .dpill.s2{color:#1f7a34; border-color:#b9ddc1; background:#eefaf0}
+html[data-theme="light"] .dpill.s1{color:#7d5c10; border-color:#e6d6a8; background:#fdf7e6}
+html[data-theme="light"] .dpill.s1{background-image:repeating-linear-gradient(45deg,transparent 0 3px,#00000008 3px 6px)}
+
+/* ── 顶部统计条 + 图例 + 切换 ── */
+.dbar{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  background:var(--bg2); border:1px solid var(--line); border-radius:var(--r);
+  padding:14px 18px; margin:0 0 14px;
+}
+.dbar-n{display:flex; align-items:baseline; gap:6px}
+.dbar-n b{font-size:20px; font-weight:750; letter-spacing:-.5px}
+.dbar-n span{font-size:12px; color:var(--fg3)}
+.dbar-b{
+  flex:1 1 160px; min-width:120px; height:8px; border-radius:6px;
+  background:var(--bg3); display:flex; overflow:hidden;
+}
+.dbar-m{background:#3fb950; display:block; height:100%}
+.dbar-d{
+  background:#e0c07a; display:block; height:100%;
+  background-image:repeating-linear-gradient(45deg,transparent 0 3px,#00000022 3px 5px);
+}
+.dbar-p{font-size:12px; color:var(--fg3); flex:none}
+
+.dlegend{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:0 0 14px}
+.dlegend-t{font-size:11.5px; color:var(--fg3); letter-spacing:.1em; margin:0 4px 0 10px}
+.dlegend-t:first-child{margin-left:0}
+
+.dswitch{display:flex; gap:8px; flex-wrap:wrap}
+.dtab{
+  font:inherit; font-size:13px; padding:5px 14px; border-radius:20px; cursor:pointer;
+  border:1px solid var(--line); background:var(--bg2); color:var(--fg2);
+}
+.dtab:hover{border-color:var(--line2); color:var(--fg); text-decoration:none}
+.dtab.on{border-color:var(--accent2); color:var(--fg)}
+
+/* ── 名单视图 ── */
+.dlist{display:flex; flex-direction:column; gap:10px}
+.drow{
+  display:grid; grid-template-columns:132px 1fr auto; gap:14px; align-items:center;
+  background:var(--bg2); border:1px solid var(--line); border-radius:var(--r);
+  padding:12px 16px; box-shadow:var(--shadow);
+}
+.drow-h{display:flex; align-items:center; gap:10px; color:var(--fg); min-width:0}
+.drow-h:hover{text-decoration:none; color:var(--accent2)}
+.drow-h .avatar{width:38px; height:38px; font-size:15px; border-radius:12px}
+.drow-n{font-weight:650; font-size:14.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.drow-b{display:flex; flex-wrap:wrap; gap:5px 14px; min-width:0}
+.dgrp{display:inline-flex; align-items:center; gap:5px; flex-wrap:wrap}
+.dgk{
+  font-style:normal; font-size:10.5px; padding:0 6px; border-radius:20px; line-height:1.7;
+  color:var(--gt); background:var(--gb);
+  border:1px solid color-mix(in srgb,var(--gc) 40%,transparent);
+}
+.dchip{
+  font:inherit; font-size:12px; padding:1px 8px; border-radius:20px; cursor:pointer;
+  color:var(--gt); background:var(--bg3);
+  border:1px solid color-mix(in srgb,var(--gc) 40%,transparent);
+  transition:background .14s, transform .14s;
+}
+.dchip:hover{transform:translateY(-1px); background:var(--gb)}
+.drow-s{display:flex; gap:8px; font-size:11.5px; color:var(--fg3); flex:none}
+.drow-s b{font-weight:600}
+.dok{color:#6cc070}
+html[data-theme="light"] .dok{color:#1f7a34}
+.dder{color:#d8b467}
+html[data-theme="light"] .dder{color:#8a6512}
+.demp{color:var(--fg3)}
+.dim{font-style:normal; color:var(--fg3); font-size:13px}
+
+/* ── 网格视图 ── */
+.dgwrap{
+  overflow:auto; max-height:76vh; border:1px solid var(--line);
+  border-radius:var(--r); background:var(--bg2);
+}
+.dgrid{border-collapse:separate; border-spacing:0; font-size:11.5px}
+.dgrid th,.dgrid td{padding:0; margin:0}
+.dgrid thead th{
+  position:sticky; top:0; z-index:2; background:var(--bg3);
+  color:var(--fg2); font-weight:600; padding:6px 0; min-width:34px; width:34px;
+  border-bottom:1px solid var(--line);
+}
+.dgrid thead th span{
+  display:block; writing-mode:vertical-rl; text-orientation:upright;
+  margin:0 auto; line-height:1.15; font-size:11px; letter-spacing:.5px;
+  padding:4px 0; white-space:nowrap;
+}
+.dgrid th.dgx,.dgrid th.dgy{
+  position:sticky; left:0; z-index:3; background:var(--bg3);
+  text-align:left; padding:0 10px; color:var(--fg2); font-weight:600;
+  min-width:86px; width:86px; white-space:nowrap; font-size:12px;
+  border-right:1px solid var(--line);
+}
+.dgrid thead th.dgx{z-index:4; top:0}
+.dgrid tbody th.dgy{border-bottom:1px solid var(--line)}
+.dgrid td{border-bottom:1px solid var(--line); border-right:1px solid var(--line)}
+.dself{background:var(--bg3); opacity:.45}
+.dcell{
+  display:block; width:100%; height:34px; font:inherit; font-size:11.5px;
+  border:0; cursor:pointer; color:var(--fg2); background:transparent;
+  transition:transform .1s;
+}
+.dcell.gx{background:
+  repeating-conic-gradient(from 0deg, var(--bg) 0% 25%, var(--bg2) 0% 50%) 0 0/8px 8px;
+  color:transparent}
+.dcell.gx:hover{background:var(--bg3)}
+.dcell:not(.gx){color:var(--gt); background:var(--gb); font-weight:600}
+.dcell.s1{border:1px dashed color-mix(in srgb,var(--gc) 55%,transparent);
+  background-image:repeating-linear-gradient(45deg,transparent 0 3px,#ffffff0d 3px 6px)}
+.dcell.s0{opacity:.5; border:1px dashed var(--line2)}
+.dcell:hover{transform:scale(1.14); z-index:1; position:relative; opacity:1}
+html[data-theme="light"] .dcell.s1{background-image:repeating-linear-gradient(45deg,transparent 0 3px,#0000000d 3px 6px)}
+
+/* ── 英雄页的对位块 ── */
+.oppk.g0,.oppk.g1,.oppk.g2,.oppk.g3,.oppk.g4{color:var(--gt); font-size:12px; font-weight:600}
+
+/* ── 详情弹层 ── */
+.dmodal{position:fixed; inset:0; z-index:80; display:none}
+.dmodal.on{display:block}
+.dmask{position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(3px)}
+html[data-theme="light"] .dmask{background:rgba(20,28,40,.34)}
+.dbox{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(560px,calc(100vw - 28px)); max-height:min(82vh,720px); overflow:auto;
+  background:var(--bg2); border:1px solid var(--line2); border-radius:var(--r);
+  padding:22px 24px 18px; box-shadow:0 24px 64px -20px rgba(0,0,0,.7);
+  animation:dpin .16s ease-out;
+}
+@keyframes dpin{from{opacity:0; transform:translate(-50%,-46%)}to{opacity:1}}
+.dhead{display:flex; align-items:flex-start; justify-content:space-between; gap:12px}
+.dvs{display:flex; align-items:center; gap:8px; font-size:19px; font-weight:700; flex-wrap:wrap}
+.dvs em{font-style:normal; font-size:12px; color:var(--fg3); font-weight:400;
+  letter-spacing:.08em; text-transform:uppercase}
+.dclose{
+  flex:none; width:30px; height:30px; border-radius:9px; cursor:pointer; font-size:18px;
+  line-height:1; border:1px solid var(--line); background:var(--bg3); color:var(--fg2);
+}
+.dclose:hover{color:var(--fg); border-color:var(--line2)}
+.dbadges{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 0}
+.dcond{margin:12px 0 0; font-size:13px; color:var(--fg2);
+  background:var(--bg3); border-radius:10px; padding:8px 12px}
+.dsec{margin:16px 0 0}
+.dsec h4{margin:0 0 5px; font-size:12px; color:var(--fg3); letter-spacing:.1em; font-weight:600}
+.dsec p{margin:0; font-size:14.5px; line-height:1.8; color:var(--fg)}
+.dev{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px}
+.dev li{font-size:13px; color:var(--fg2); border-left:2px solid var(--line2); padding-left:10px}
+.dev a{font-family:var(--mono); font-size:12.5px}
+.dev q{display:block; color:var(--fg); font-size:13.5px; margin-top:2px; quotes:"「" "」"}
+.dnote{
+  margin:16px 0 0; font-size:13px; line-height:1.75; color:var(--fg2);
+  border-top:1px dashed var(--line); padding-top:12px;
+}
+.dfoot{margin:14px 0 0; font-size:11.5px; color:var(--fg3); letter-spacing:.06em}
+.dnofoot{font-size:12.5px; color:var(--fg3); max-width:74ch; line-height:1.8}
+
 /* ─────────── 响应式 ─────────── */
 @media (max-width:720px){
   body{font-size:15px}
@@ -384,6 +573,18 @@ html[data-theme="light"] .pill.l{color:#2f5c96;border-color:#c5d7ee;background:#
   .entry .id{display:none}
   .entry .body{padding:2px 14px 15px}
   .hhead .avatar{width:58px;height:58px;font-size:23px;border-radius:19px}
+  .drow{grid-template-columns:1fr;gap:9px;padding:11px 13px}
+  .drow-h .avatar{width:32px;height:32px;font-size:13.5px;border-radius:10px}
+  .drow-s{justify-content:flex-start}
+  .dbar{gap:10px 14px;padding:12px 14px}
+  .dbar-n b{font-size:17px}
+  .dbar-p{width:100%}
+  .dgrid th.dgx,.dgrid th.dgy{min-width:64px;width:64px;font-size:11px;padding:0 7px}
+  .dgrid thead th{min-width:30px;width:30px}
+  .dcell{height:30px;font-size:10.5px}
+  .dgrid thead th span{font-size:10px;letter-spacing:0}
+  .dbox{padding:18px 16px 14px;max-height:88vh}
+  .dvs{font-size:17px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{.top,.foot{display:none}.entry>summary{grid-template-columns:1fr}.entry .body{display:block!important}}
