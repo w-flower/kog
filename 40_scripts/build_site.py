@@ -191,6 +191,7 @@ def parse_opp(title: str) -> str:
 
 LANE_ALIAS = {"中路": "mid", "中": "mid", "mid": "mid",
               "游走": "roam", "辅助": "roam", "roam": "roam",
+              "硬辅": "roam", "软辅": "roam", "功能辅": "roam", "科研位": "roam",
               "发育路": "adc", "射手": "adc", "adc": "adc",
               "对抗路": "solo", "边路": "solo", "solo": "solo",
               "打野": "jungle", "jungle": "jungle"}
@@ -202,7 +203,7 @@ def lanes_in_title(title: str) -> list[str]:
     if not m:
         return []
     out = []
-    for part in re.split(r"[／/、,，]", m.group(1)):
+    for part in re.split(r"[／/、,，·]", m.group(1)):
         k = LANE_ALIAS.get(part.strip())
         if k and k not in out:
             out.append(k)
@@ -240,6 +241,9 @@ def sections_as_entries(path: Path) -> list[dict]:
     for k, i in enumerate(heads):
         end = heads[k + 1] if k + 1 < len(heads) else len(body)
         title = body[i][3:].strip()
+        # 「0. 大局观定位」已经在英雄页顶部用三栏块展示，不再重复成条目
+        if "大局观定位" in title:
+            continue
         html = md_to_html("\n".join(body[i + 1:end]).strip())
         if not html.strip():
             continue
@@ -272,7 +276,10 @@ def collect() -> dict:
                 e["sum"] = first_sentence(e["html"])
             doc = {"title": title, "file": f.name, "intro": intro,
                    "entries": entries, "hero": f.stem, "cat": key,
-                   "fm_title": fm_field(f, "title")}
+                   "fm_title": fm_field(f, "title"),
+                   # 大局观定位三件套（s14_tempo.py 写入）
+                   "tempo": fm_field(f, "tempo"), "job": fm_field(f, "job"),
+                   "motto": fm_field(f, "motto")}
             docs.append(doc)
             if key == "L":
                 lane_docs.append(doc)
@@ -288,9 +295,12 @@ def collect() -> dict:
             if c["key"] in ("A", "B"):
                 h = heroes.setdefault(d["hero"], {
                     "name": d["hero"], "hue": hue_of(d["hero"]), "a": [], "b": [],
-                    "lanes": []})
+                    "lanes": [], "tempo": "", "job": "", "motto": ""})
                 if c["key"] == "A":
                     h["lanes"] = lanes_in_title(d.get("fm_title") or d["title"])
+                    h["tempo"] = d.get("tempo") or ""
+                    h["job"] = d.get("job") or ""
+                    h["motto"] = d.get("motto") or ""
                 slot = "a" if c["key"] == "A" else "b"
                 for e in d["entries"]:
                     if slot == "b":

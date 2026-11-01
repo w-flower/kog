@@ -46,16 +46,29 @@
     </details>`;
   }
 
+  /* ── 大局观定位：强势期 / 节奏职责 / 一句话 ── */
+  const TEMPO_CN = { early: '前期', mid: '中期', late: '后期', even: '全期' };
+  const JOB_CN = { open: '开节奏', follow: '跟节奏', hold: '守节奏',
+                   scout: '视野侦察', split: '带线牵制' };
+  function planTags(h) {
+    const out = [];
+    if (h.tempo) out.push(`<span class="pill t-${esc(h.tempo)}">${esc(TEMPO_CN[h.tempo] || h.tempo)}</span>`);
+    if (h.job) out.push(`<span class="pill j-${esc(h.job)}">${esc(JOB_CN[h.job] || h.job)}</span>`);
+    return out.join('');
+  }
+
   /* ── 英雄卡 ── */
   function heroCard(h) {
     const pills = [];
     if (h.a.length) pills.push(`<span class="pill a">怎么玩 ${h.a.length}</span>`);
     if (h.b.length) pills.push(`<span class="pill b">对位 ${h.b.length}</span>`);
     if (!pills.length) pills.push('<span class="pill g">待补</span>');
+    const plan = planTags(h);
     return `<a class="hcard" href="#H:${encodeURIComponent(h.name)}">
       <span class="avatar" style="--h:${h.hue}">${esc(h.name.slice(0, 1))}</span>
       <span class="hname">${esc(h.name)}</span>
       <span class="hmeta">${pills.join('')}</span>
+      ${plan ? `<span class="hplan">${plan}</span>` : ''}
     </a>`;
   }
 
@@ -147,6 +160,23 @@
            的克制条目里提到了他，点进去看具体打法。</p></section>`
       : '';
 
+    const plan = (h.tempo || h.job || h.motto)
+      ? `<div class="planbox">
+           <div class="pb-cell">
+             <span class="pb-k">强势期</span>
+             <b>${esc(TEMPO_CN[h.tempo] || '—')}</b>
+           </div>
+           <div class="pb-cell">
+             <span class="pb-k">节奏职责</span>
+             <b>${esc(JOB_CN[h.job] || '—')}</b>
+           </div>
+           <div class="pb-cell wide">
+             <span class="pb-k">一句话</span>
+             <b>${esc(h.motto || '—')}</b>
+           </div>
+         </div>`
+      : '';
+
     view.innerHTML = `
       <a class="back" href="#">← 全部英雄</a>
       <div class="hhead">
@@ -156,6 +186,7 @@
           <div class="hmeta">
             <span class="pill g">${h.n} 条</span>
             ${h.b_n ? `<span class="pill b">对位 ${h.b_n}</span>` : ''}
+            ${planTags(h)}
             ${(h.lanes || []).map(k => {
               const l = (D.lanes || []).find(x => x.key === k);
               return l ? `<a class="pill l" href="#lane:${encodeURIComponent(l.file)}">${esc(l.name)}大局观</a>` : '';
@@ -163,6 +194,7 @@
           </div>
         </div>
       </div>
+      ${plan}
       ${secA}${secB}${inc}
     `;
   }
