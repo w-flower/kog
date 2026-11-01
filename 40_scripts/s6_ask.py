@@ -206,7 +206,8 @@ def main() -> int:
 
     labels = {"A": "英雄", "B": "克制", "C": "BP", "D": "对局内", "L": "分路"}
     for h in hits:
-        print(f"[{h['score']:>4}] {h['id']} {h['title']}")
+        tag = h.get("id") or h.get("phase", "")
+        print(f"[{h['score']:>4}] {tag} {h['title']}")
         print(f"        {labels.get(h.get('cat'), '?')}类 / {h.get('path', h['file'])}"
               f":{h['line']}-{h['end_line']}  ({h['status']}, {h.get('confidence','')})")
     if hits[0]["score"] < 4:

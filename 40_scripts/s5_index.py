@@ -100,6 +100,45 @@ def parse_entries(path: Path) -> list[dict]:
     return out
 
 
+def parse_sections(path: Path) -> list[dict]:
+    """叙述式文档（A 类英雄卡：机制/出装/全局/弱点）→ 按 `## ` 切成可检索小节。
+
+    不加这一步的话，新写的英雄卡在检索里完全搜不到 —— 它们没有 K 编号。
+    """
+    txt = path.read_text(encoding="utf-8")
+    mfm = re.search(r"^---\n(.*?)\n---", txt, re.S)
+    fm_text = mfm.group(1) if mfm else ""
+    bvs = re.findall(r"BV[0-9A-Za-z]{10}", fm_text)
+    lines = txt.splitlines()
+    start = 0
+    for i, ln in enumerate(lines):
+        if ln.startswith("# "):
+            start = i + 1
+            break
+    body = lines[start:]
+    heads = [i for i, ln in enumerate(body) if ln.startswith("## ")]
+    out = []
+    for k, i in enumerate(heads):
+        end = heads[k + 1] if k + 1 < len(heads) else len(body)
+        title = body[i][3:].strip()
+        if title in ("来源", "待补") or title.startswith("来源") or title.startswith("待补"):
+            continue
+        chunk = body[i + 1:end]
+        fields: dict[str, str] = {"来源": " ".join(bvs), "可信度": "中（seed 卡，单来源）"}
+        for ln in chunk:
+            fm = FIELD_RE.match(ln.strip())
+            if fm:
+                kk, vv = fm.group(1), fm.group(2).strip()
+                fields[kk] = (fields[kk] + " / " + vv) if kk in fields else vv
+        out.append({
+            "id": "", "cat": "A", "title": title,
+            "line": start + i + 1, "end_line": start + end,
+            "fields": fields, "file": path.name,
+            "path": str(path.relative_to(KB)),
+        })
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--strict", action="store_true")
@@ -113,7 +152,12 @@ def main() -> int:
     for md in sorted(KB.rglob("*.md")):
         if md.name.startswith("_"):
             continue
-        for e in parse_entries(md):
+        _ents = parse_entries(md)
+        if not _ents:
+            _raw = md.read_text(encoding="utf-8")
+            if re.search(r"^cat: A", _raw, re.M):
+                _ents = parse_sections(md)
+        for e in _ents:
             f = e["fields"]
             src = f.get("来源", "")
             bvids = list(dict.fromkeys(BV_RE.findall(src)))
