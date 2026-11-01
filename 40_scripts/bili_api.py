@@ -72,11 +72,12 @@ def wbi(path: str, params: dict) -> str:
 
 
 def search(kw: str, page: int = 1, order: str = "") -> list[dict]:
+    """搜索。2026-11 起旧接口 x/web-interface/search/type 未登录必 412，
+    改走 wbi 签名的 x/web-interface/wbi/search/type（无 SESSDATA 也能用）。"""
     p = {"search_type": "video", "keyword": kw, "page": page}
     if order:
         p["order"] = order
-    d = _get("https://api.bilibili.com/x/web-interface/search/type?"
-             + urllib.parse.urlencode(p))
+    d = _get(wbi("x/web-interface/wbi/search/type", p))
     if d.get("code") != 0:
         raise RuntimeError(f"search code={d.get('code')} {d.get('message')}")
     return ((d.get("data") or {}).get("result") or [])

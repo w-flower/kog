@@ -33,9 +33,11 @@
 
   /* ── 条目折叠卡 ── */
   function entryCard(e, open) {
-    return `<details class="entry" id="${esc(e.id)}"${open ? ' open' : ''}>
+    const idAttr = e.id ? ` id="${esc(e.id)}"` : '';
+    const idTag  = e.id ? `<span class="id">${esc(e.id)}</span>` : '';
+    return `<details class="entry"${idAttr}${open ? ' open' : ''}>
       <summary>
-        <span class="id">${esc(e.id)}</span>
+        ${idTag}
         <span class="tt"><b>${esc(e.title)}</b>
           <span>${esc(e.sum || '')}</span></span>
         <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>

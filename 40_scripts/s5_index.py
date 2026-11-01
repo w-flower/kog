@@ -34,6 +34,7 @@ SEC_RE = re.compile(r"^#{2,3}\s+")
 TS_RE = re.compile(r"(\d{1,2}):(\d{2})")
 BV_RE = re.compile(r"BV[0-9A-Za-z]{10}")
 FIELD_RE = re.compile(r"^[-*]\s*(?:\*\*)?([\u4e00-\u9fa5A-Za-z]{2,10})(?:\*\*)?\s*[:：]\s*(.+)$")
+DOC_SOURCES = {"BV1ydMZ6bE8n"}  # 用户提供的《冲击巅峰千强·辅助篇》原视频，无字幕文件，按文档源处理
 TOL = 3.0
 
 
@@ -132,7 +133,9 @@ def main() -> int:
                     times = cache[bv]
                     if times:
                         have.append((bv, times))
-                if not have:
+                if not have and set(bvids) <= DOC_SOURCES:
+                    status = "doc"      # 文档类来源：正文是用户给的整理稿，不走字幕时间戳校验
+                elif not have:
                     status = "unverified"
                 else:
                     for ts in stamps:
@@ -176,7 +179,7 @@ def main() -> int:
 
     print(f"indexed={len(entries)} -> {IDX / 'index.jsonl'}")
     bad = [e for e in entries if e["check"] == "bad_timestamp"]
-    print(f"bad_timestamp={len(bad)} unverified={sum(1 for e in entries if e['check']=='unverified')}")
+    print(f"bad_timestamp={len(bad)} unverified={sum(1 for e in entries if e['check']=='unverified')} doc={sum(1 for e in entries if e['check']=='doc')}")
     for p in problems:
         print("  ! " + p)
     if args.strict and bad:

@@ -221,6 +221,34 @@ def fm_field(path: Path, key: str) -> str:
     return ""
 
 
+def sections_as_entries(path: Path) -> list[dict]:
+    """叙述式文档（没有 K 编号的 A 类英雄卡）→ 按 `## 二级标题` 切成伪条目。
+
+    为什么要这个：A 类里有两种写法，一种是 K 条目，一种是"讲透一篇"的叙述卡
+    （机制内核 / 出装 / 全局思路 / 弱点）。后者没有 K 编号，如果不切，英雄页会显示"还没有条目"。
+    """
+    raw = FM_RE.sub("", path.read_text(encoding="utf-8"), count=1)
+    lines = raw.splitlines()
+    start = 0
+    for i, ln in enumerate(lines):
+        if ln.startswith("# "):
+            start = i + 1
+            break
+    body = lines[start:]
+    heads = [i for i, ln in enumerate(body) if ln.startswith("## ")]
+    out: list[dict] = []
+    for k, i in enumerate(heads):
+        end = heads[k + 1] if k + 1 < len(heads) else len(body)
+        title = body[i][3:].strip()
+        html = md_to_html("\n".join(body[i + 1:end]).strip())
+        if not html.strip():
+            continue
+        out.append({"id": "", "cat": "", "title": title,
+                    "self": f"<h3>{inline(title)}</h3>", "html": html,
+                    "sum": first_sentence(html)})
+    return out
+
+
 def collect() -> dict:
     cats = []
     lane_docs: list[dict] = []
@@ -238,6 +266,8 @@ def collect() -> dict:
             if f.name.startswith("_"):
                 continue
             title, intro, entries = split_doc(f)
+            if not entries and key in ("A", "B"):
+                entries = sections_as_entries(f)
             for e in entries:
                 e["sum"] = first_sentence(e["html"])
             doc = {"title": title, "file": f.name, "intro": intro,
@@ -332,7 +362,7 @@ def collect() -> dict:
     return {"version": VERSION, "heroes": hero_list, "general": general,
             "lanes": lane_list, "stages": stages, "lane_about": lane_about,
             "cats": [{"key": c["key"], "name": c["name"], "desc": c["desc"],
-                      "n": sum(len(d["entries"]) for d in c["docs"])} for c in cats],
+                      "n": sum(len([e for e in d["entries"] if e.get("id")]) for d in c["docs"])} for c in cats],
             "overview": overview}
 
 
