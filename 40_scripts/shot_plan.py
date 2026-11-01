@@ -14,7 +14,7 @@ shots = [
     ("p_mob_hero.png", 390, 844, "#H:%E7%8E%8B%E7%BB%B4"),
     ("p_desk_mtx.png", 1440, 1100, "#matrix"),
     ("p_mob_mtx.png", 390, 844, "#matrix"),
-    ("p_desk_kaI.png", 1440, 1000, "#H:%E9%93%A0"),
+    ("p_desk_kaI.png", 1440, 1000, "#H:%E5%A4%8F%E6%B4%9B%E7%89%B9"),
 ]
 
 errs = []

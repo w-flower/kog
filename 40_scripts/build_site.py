@@ -300,8 +300,16 @@ def collect() -> dict:
             if f.name.startswith("_"):
                 continue
             title, intro, entries = split_doc(f)
-            if not entries and key in ("A", "B"):
-                entries = sections_as_entries(f)
+            if key in ("A", "B"):
+                secs = sections_as_entries(f)
+                if key == "B":
+                    # 「## 官方口径」是 `##` 级，split_doc 只认 `### K-xxx`，
+                    # 一旦卡里出现 K 条目，官方表格就会被挤进 intro 而在英雄页消失。
+                    # 所以这里把它单独拎成一条，放在实测条目前面。
+                    off = [s for s in secs if "官方口径" in s["title"]]
+                    entries = off + entries
+                elif not entries:
+                    entries = secs
             for e in entries:
                 e["sum"] = first_sentence(e["html"])
             doc = {"title": title, "file": f.name, "intro": intro,
