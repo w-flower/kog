@@ -3,6 +3,9 @@
 60_state/
 # raw/ 是 B 站视频字幕原文，只允许本地留档，不发布（版权边界）
 10_sources/
+# 专栏候选清单带搜索接口返回的长摘要（版权边界），本地留档即可；
+# 对外只留 30_index/duel/*.col_verdicts.jsonl 里的 ≤80 字摘录
+30_index/duel/columns.json
 
 # ── 本地产物 / 日志 ──
 50_logs/

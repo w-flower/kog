@@ -513,7 +513,8 @@
           const when = (e.k === 'video' || e.k === 'column') && e.ts != null
             ? ` @ ${mmss(e.ts)}` : '';
           // 官方口径的 ref 是站点内部的文件名，对人没意义，只留可点的官方页面
-          const tail = e.k === 'official' || !e.ref ? '' : ' · ' + esc(e.ref);
+          const shown = e.k === 'column' ? 'cv' + e.ref : e.ref;
+          const tail = e.k === 'official' || !e.ref ? '' : ' · ' + esc(shown);
           const src = e.url
             ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(tag)}${tail}${when}</a>`
             : `<span class="devsrc">${esc(tag)}${tail}</span>`;
@@ -607,8 +608,9 @@
         <p class="eyebrow">${esc(g.version || D.version)} · 同路对位</p>
         <h1>${esc(g.cn || lane)} · ${g.heroes.length} × ${g.heroes.length - 1} 全矩阵</h1>
         <p class="lede">这一路<b>所有</b>英雄两两配对，谁克谁一格一格摆出来。
-          五档是判断，三态是证据强弱：<b>实测</b>有人真讲过并留了秒数，<b>推演</b>只有方向没有验证，
-          <b>待补</b>就是还没人讲。点任意一格看依据、成立条件和出处。</p>
+          五档是判断，三态是证据强弱：<b>实测</b>有人真讲过、点得开原文，
+          <b>推演</b>只有方向没有验证，<b>待补</b>是还没人讲——<b>待补不等于五五开</b>，
+          只是暂时查不到来源。点任意一格看依据、成立条件和出处。</p>
       </div>
 
       <section class="sec">
@@ -640,8 +642,13 @@
       <section class="sec">${listBody}</section>
 
       <p class="dnofoot">为什么这么多格是空的：官方关系页每个方向固定只列 2 个例子，
-        而且 77% 是跨路对位；同路对位要靠视频字幕与专栏逐条挖，通过率不高。
+        而且 77% 是跨路对位；同路对位只能一篇篇专栏、一条条字幕去挖。
+        「待补」记录的是<b>没查到</b>，不是<b>均势</b>——这两件事在实战里差很远。
         补齐进度记在 <a href="#doc:96_素材缺口.md">素材缺口</a>里。</p>
+      ${(cov.grades || {})['五五开'] === 0 ? `<p class="dnofoot">
+        「五五开」这一档现在<b>是空的</b>，不是因为其余对位都分出了胜负，
+        是因为没有一个 UP 会专门做「谁跟谁五五开」——它只会以「不算克制」的形式出现，
+        而这恰恰是现有素材里最难被说出口的一句话。宁可不填。</p>` : ''}
     `;
     view.querySelectorAll('.dtab[data-mode]').forEach(btn => {
       btn.addEventListener('click', () => renderDuel(lane, btn.dataset.mode));

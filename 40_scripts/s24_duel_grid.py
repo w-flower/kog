@@ -63,8 +63,13 @@ def key(a: str, b: str, lane: str) -> str:
 
 # ────────────────────────── 建格子 ──────────────────────────
 def lane_heroes(lane: str) -> list[str]:
+    """矩阵英雄池 = 官方 lanes 里含该路的全部英雄（不是只看 main_lane）。
+
+    只看主位会漏掉诸葛亮、貂蝉、司马懿这些「主位写的是打野/边路、
+    实际天天在中路」的英雄，而这几个恰恰是对位问题里最常出现的名字。
+    """
     N = names.load()
-    return sorted(N.by_lane(lane))
+    return sorted(N.by_lane(lane, primary_only=False))
 
 
 def skeleton(lane: str) -> dict[str, dict]:
@@ -144,8 +149,9 @@ def _entry_fields(md: str, eid: str) -> dict:
 
 
 # ────────────────────────── 裁决 ──────────────────────────
-def load_verdicts(lane: str) -> dict[str, dict]:
-    p = DUEL / f"{lane}.verdicts.jsonl"
+def load_verdicts(lane: str, suffix: str = "verdicts") -> dict[str, dict]:
+    """suffix=verdicts 是人写的；suffix=col_verdicts 是 s25 从专栏自动生成的。"""
+    p = DUEL / f"{lane}.{suffix}.jsonl"
     if not p.exists():
         return {}
     out: dict[str, dict] = {}
@@ -251,9 +257,12 @@ def stats(cells: dict[str, dict]) -> dict:
 def build(lane: str) -> tuple[dict[str, dict], dict]:
     cells = skeleton(lane)
     n_off = seed_official(cells, lane)
+    n_c = apply_verdicts(cells, load_verdicts(lane, "col_verdicts"), lane)
+    # 人工裁决放最后，覆盖自动生成的那一层
     n_v = apply_verdicts(cells, load_verdicts(lane), lane)
     n_m = mirror(cells, lane)
-    return cells, {"official": n_off, "verdicts": n_v, "mirrored": n_m}
+    return cells, {"official": n_off, "columns": n_c, "verdicts": n_v,
+                   "mirrored": n_m}
 
 
 def save(cells: dict[str, dict], lane: str, meta: dict) -> None:

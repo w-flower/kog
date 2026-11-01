@@ -152,3 +152,192 @@ def cid_of(bvid: str) -> int:
     d = _get(f"https://api.bilibili.com/x/player/pagelist?bvid={bvid}")
     ps = (d.get("data") or [])
     return int(ps[0].get("cid") or 0) if ps else 0
+
+
+# ══════════════════════════════════════════════════════════════
+# 节流 / 重试 / 清洗 —— 专栏链要用的三件套
+#
+# 2026-11 实测：专栏搜索与全文接口匿名能跑，但 -352（风控）极容易触发。
+# 连发 3 条成功率约 1/3；间隔拉到 8 秒 + 指数退避后基本稳定。
+# 所以这里不是"优雅重试"，是"必须重试"——不加就是大半请求白跑。
+# ══════════════════════════════════════════════════════════════
+
+RETRY_CODES = {-352, -412, -799, -509, -504}
+GAP = {"search": 8.0, "article": 14.0, "default": 1.0}
+_last_call: dict[str, float] = {}
+
+
+def throttle(kind: str = "default", gap: float | None = None) -> None:
+    """同类请求之间强制拉开间隔。kind 不同的通道互不影响。"""
+    g = GAP.get(kind, GAP["default"]) if gap is None else gap
+    wait = _last_call.get(kind, 0.0) + g - time.time()
+    if wait > 0:
+        time.sleep(wait)
+    _last_call[kind] = time.time()
+
+
+def wbi_get(path: str, params: dict, referer: str = "https://www.bilibili.com/",
+            tries: int = 5, kind: str = "default", backoff: float = 7.0) -> dict:
+    """带节流 + 指数退避的 wbi GET。每次重试都重新签名（wts 会过期）。
+
+    返回最后一次的原始响应（含 code），由调用方决定算不算失败——
+    这里不抛异常，是为了让上层能区分"没找到"和"被风控"。
+    """
+    last: dict = {"code": -1, "message": "no attempt"}
+    for i in range(tries):
+        throttle(kind)
+        try:
+            d = _get(wbi(path, params), referer)
+        except Exception as exc:                      # 网络层错误也要退避重试
+            last = {"code": -1, "message": f"{type(exc).__name__}: {exc}"}
+            if i < tries - 1:
+                time.sleep(backoff * (i + 1))
+            continue
+        if d.get("code") not in RETRY_CODES:
+            return d
+        last = d
+        if i < tries - 1:
+            time.sleep(backoff * (i + 1))
+    return last
+
+
+# 搜索结果是富文本，标题带 <em class="keyword">，直接进库会污染别名匹配
+_TAG_RE = re.compile(r"</?[a-zA-Z][^<>]{0,120}>")
+_ENT = {"&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'",
+        "&apos;": "'", "&nbsp;": " ", "&ensp;": " ", "&emsp;": " ",
+        "&ldquo;": "“", "&rdquo;": "”", "&mdash;": "—", "&middot;": "·"}
+
+
+def clean_text(s: str) -> str:
+    """去标签 / 去实体 / 去零宽字符 / 压空白。标题、摘要、正文都过这一道。"""
+    s = _TAG_RE.sub("", s or "")
+    for k, v in _ENT.items():
+        s = s.replace(k, v)
+    s = re.sub(r"[\u200b-\u200f\u202a-\u202e\ufeff]", "", s)
+    s = s.replace("\r\n", "\n").replace("\r", "\n")
+    s = re.sub(r"[ \t\u3000]+", " ", s)
+    return re.sub(r"\n{3,}", "\n\n", s).strip()
+
+
+def search_articles(kw: str, page: int = 1, tries: int = 4) -> list[dict]:
+    """搜专栏。返回清洗过的元数据；被风控到彻底失败时抛 RuntimeError。
+
+    字段比视频搜索少，但 `id`（cv 号）够后续取全文。
+    """
+    d = wbi_get("x/web-interface/wbi/search/type",
+                {"search_type": "article", "keyword": kw, "page": page},
+                kind="search", tries=tries)
+    if d.get("code") != 0:
+        raise RuntimeError(f"article search code={d.get('code')} {d.get('message')}")
+    out = []
+    for r in ((d.get("data") or {}).get("result") or []):
+        cv = str(r.get("id") or "")
+        if not cv.isdigit():
+            continue
+        out.append({
+            "cv": cv,
+            "title": clean_text(r.get("title")),
+            "desc": clean_text(r.get("desc") or ""),
+            "author": clean_text(r.get("author") or ""),
+            "mid": r.get("mid") or 0,
+            "view": r.get("view") or 0,
+            "like": r.get("like") or 0,
+            "pub_time": r.get("pub_time") or 0,
+            "url": f"https://www.bilibili.com/read/cv{cv}",
+        })
+    return out
+
+
+def _para_text(p: dict) -> str:
+    """段落正文。opus 新格式是 {"nodes":[{"word":{"words":"..."}}]}，
+    老格式是纯字符串，两种都要能吃。"""
+    t = p.get("text")
+    if isinstance(t, str):
+        return t
+    if not isinstance(t, dict):
+        return ""
+    out: list[str] = []
+    for n in (t.get("nodes") or []):
+        if not isinstance(n, dict):
+            continue
+        w = n.get("word")
+        if isinstance(w, dict) and w.get("words"):
+            out.append(str(w["words"]))
+        elif isinstance(w, str):
+            out.append(w)
+    return "".join(out)
+
+
+def article_view(cv: str | int, tries: int = 3) -> dict:
+    """专栏全文。返回 {cv,title,author,text,url}，text 是纯文本段落。
+
+    正文在 data.opus.content.paragraphs[]，每段是 nodes 树，不是纯字符串。
+    老文章没有 opus 层，退回 data.content（HTML），同样清洗成纯文本。
+    """
+    cv = str(cv).lstrip("cv")
+    # 实测：-352 在这个接口上多是"这篇要登录/已失效"，重试 5 次和 2 次结果一样，
+    # 只是白等 60 秒。给 3 次就够，把时间让给下一篇。
+    d = wbi_get("x/article/view", {"id": cv},
+                referer=f"https://www.bilibili.com/read/cv{cv}",
+                kind="article", tries=tries, backoff=5.0)
+    if d.get("code") != 0:
+        raise RuntimeError(f"article view cv{cv} code={d.get('code')} {d.get('message')}")
+    data = d.get("data") or {}
+    opus = data.get("opus") or {}
+    paras = ((opus.get("content") or {}).get("paragraphs") or [])
+    chunks = []
+    for p in paras:
+        t = _para_text(p)
+        if t:
+            chunks.append(t)
+        elif p.get("para_type") == 2:
+            chunks.append("[图]")
+    text = "\n\n".join(chunks)
+    if not text:
+        text = clean_text(data.get("content") or "")
+    return {
+        "cv": cv,
+        "title": clean_text(opus.get("title") or data.get("title") or ""),
+        "author": clean_text(((opus.get("author") or {}).get("name")
+                              or (data.get("author") or {}).get("name") or "")),
+        "pub_time": data.get("publish_time") or data.get("ctime") or 0,
+        "text": clean_text(text),
+        "url": f"https://www.bilibili.com/read/cv{cv}",
+    }
+
+
+# ── 落盘缓存：抓一次就别再抓 ────────────────────────────────
+# 放在 10_sources/ 下（该目录已 gitignore，正文有版权，不能进仓库）
+CACHE = Path(__file__).resolve().parent.parent / "10_sources" / "bili_cache"
+
+
+def cache_path(kind: str, key: str) -> Path:
+    return CACHE / kind / f"{re.sub(r'[^0-9A-Za-z_.-]', '_', str(key))}.json"
+
+
+def cache_get(kind: str, key: str) -> dict | None:
+    p = cache_path(kind, key)
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def cache_put(kind: str, key: str, obj: dict) -> None:
+    p = cache_path(kind, key)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(obj, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def cached(kind: str, key: str, fn, force: bool = False):
+    """kind/key 命中缓存就直接返回，否则调 fn() 并落盘。"""
+    if not force:
+        hit = cache_get(kind, key)
+        if hit is not None:
+            return hit
+    obj = fn()
+    if obj:
+        cache_put(kind, key, obj)
+    return obj

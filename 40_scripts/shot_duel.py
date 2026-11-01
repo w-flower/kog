@@ -20,6 +20,7 @@ steps = [
     ("d_desk_grid.png", 1440, 1100, "#duel:mid", "grid"),
     ("d_desk_modal.png", 1440, 1100, "#duel:mid", "modal"),
     ("d_desk_hero.png", 1440, 1400, "#H:" + quote("女娲"), None),
+    ("d_desk_hero2.png", 1440, 1400, "#H:" + quote("不知火舞"), None),
     ("d_mob_list.png", 390, 844, "#duel:mid", None),
     ("d_mob_grid.png", 390, 844, "#duel:mid", "grid"),
     ("d_mob_modal.png", 390, 844, "#duel:mid", "modal"),

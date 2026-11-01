@@ -28,6 +28,8 @@ IDX = Path(r"C:/Users/Lenovo/WorkBuddy/kog/30_index")
 # 口语 / 错别字 / 简称 → 官方名。
 # 目标名不在官方名录里的会被 _prune() 剔掉，所以这里可以放心写。
 ALIAS: dict[str, str] = {
+    # 常见听写/笔误（专栏里真的出现过，不加就漏整条边）
+    "米莱迪": "米莱狄",
     # ── 中路 ──
     "火舞": "不知火舞", "上官": "上官婉儿", "婉儿": "上官婉儿",
     "干将": "干将莫邪", "莫邪": "干将莫邪",
@@ -113,6 +115,19 @@ class Names:
     def lane_of(self, name: str) -> str:
         h = self.by_name.get(name)
         return (h or {}).get("main_lane", "")
+
+    def lane_set(self, name: str) -> set[str]:
+        """这个英雄官方认定可以走的全部位置。
+
+        为什么需要它：main_lane 取的是官方 roles 的第一个，顺序很不可靠——
+        诸葛亮的 main_lane 是 jungle（他确实常打野），但中路对位必须有他；
+        大乔反过来被写成了 mid。判「是不是中路人」只能用全集，不能用主位。
+        """
+        h = self.by_name.get(name)
+        return set((h or {}).get("lanes") or [])
+
+    def in_lane(self, name: str, lane: str) -> bool:
+        return lane in self.lane_set(name)
 
 
 @functools.lru_cache(maxsize=1)

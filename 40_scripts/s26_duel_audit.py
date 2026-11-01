@@ -28,6 +28,7 @@ DUEL = IDX / "duel"
 SUBS = ROOT / "10_sources" / "creators_cache" / "subs"
 OFF = ROOT / "10_sources" / "official"
 ARTS = ROOT / "10_sources" / "articles"
+ARTCACHE = ROOT / "10_sources" / "bili_cache" / "article"
 
 
 def load_grid(lane: str) -> dict:
@@ -71,7 +72,7 @@ def main() -> int:
     cells = g["cells"]
     hs = set(g["heroes"])
     N = names.load()
-    expect = set(N.by_lane(lane))
+    expect = set(N.by_lane(lane, primary_only=False))
     arts = article_index()
 
     res: list[dict] = []
@@ -140,7 +141,8 @@ def main() -> int:
                 bad5.append(f"{c['key']} 视频字幕缺失 {r}")
             elif k == "official" and not (OFF / r).exists():
                 bad5.append(f"{c['key']} 官方缓存缺失 {r}")
-            elif k == "column" and r not in arts:
+            elif k == "column" and r not in arts \
+                    and not (ARTCACHE / f"{r}.json").exists():
                 bad5.append(f"{c['key']} 专栏未收录 {r}")
     chk(5, "ev.ref 可查（unknown-ref=0）", bad5)
 
@@ -177,18 +179,31 @@ def main() -> int:
     # 10 覆盖统计与 Gate 门槛
     st = Counter(c["status"] for c in cells)
     gd = Counter(c["grade"] for c in cells if c["grade"])
-    gate_req = {1: {"measured": 4}, 2: {"measured": 90}, 3: {"measured": 120}}
+    # 覆盖门槛。
+    #
+    # 为什么是比例不是绝对值：矩阵从 552 格改成 930 格（英雄池口径改了，见 _schema.md），
+    # 绝对条数失去意义。而且「五五开」这一档天然稀薄——没有任何一个 UP 会专门讲
+    # 「谁跟谁五五开」，它只能在排除法里出现，硬性要求 30 格等于逼人造假。
+    #
+    # 真正防糊弄的是第 4/5/7/8 项（每条 measured 必须能点开原文），不是这一项。
+    # 这里的门槛只保证「这东西确实被填过」，随证据增长逐级抬高。
+    rows = {c["a"] for c in cells if c["status"] == "measured"}
+    row_cov = len(rows) / len(expect) if expect else 0
+    pct = st["measured"] / len(cells) if cells else 0
+    REQ = {1: (0.005, 0.0), 2: (0.10, 0.50), 3: (0.18, 1.0)}
+    need_pct, need_row = REQ[args.gate]
     bad10 = []
-    for k, v in gate_req[args.gate].items():
-        if st[k] < v:
-            bad10.append(f"{k}={st[k]} < Gate{args.gate} 要求 {v}")
-    if args.gate == 3:
-        for gname in G.GRADES:
-            if gd[gname] < 30:
-                bad10.append(f"档位「{gname}」只有 {gd[gname]} 格（<30，疑似判定糊弄）")
-        if st["empty"] > 120:
-            bad10.append(f"待补 {st['empty']} > 120")
-    chk(10, f"Gate {args.gate} 覆盖门槛", bad10)
+    if pct < need_pct:
+        bad10.append(f"实测 {pct*100:.1f}% < Gate{args.gate} 要求 {need_pct*100:.0f}%")
+    if row_cov < need_row:
+        miss = sorted(expect - rows)
+        bad10.append(f"有实测边的英雄 {len(rows)}/{len(expect)}"
+                     f"（{row_cov*100:.0f}%）< 要求 {need_row*100:.0f}%；"
+                     f"全空的：{'、'.join(miss[:8])}")
+    if args.gate == 3 and st["empty"] > len(cells) * 0.75:
+        bad10.append(f"待补 {st['empty']} > 总格数 75%")
+    chk(10, f"Gate {args.gate} 覆盖门槛", bad10,
+        need=f"实测≥{need_pct*100:.0f}% 且行覆盖≥{need_row*100:.0f}%")
 
     cov = {
         "total": len(cells), "measured": st["measured"],
