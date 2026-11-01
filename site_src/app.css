@@ -116,7 +116,24 @@ html[data-theme="light"] .avatar{
 }
 .pill.a{color:#8fd18a;border-color:#2f5233;background:#16241a}
 .pill.b{color:#f0a9a0;border-color:#5a2b28;background:#261715}
+.pill.l{color:#9fc4f5;border-color:#2c4560;background:#151f2b}
 .pill.g{color:var(--fg3)}
+
+/* ─────────── 分路卡 ─────────── */
+.lcard{
+  position:relative; display:flex; flex-direction:column; gap:10px; padding:16px 14px 14px;
+  background:var(--bg2); border:1px solid var(--line); border-radius:var(--r);
+  color:var(--fg); box-shadow:var(--shadow);
+  transition:transform .16s ease, border-color .16s ease;
+}
+.lcard:hover{text-decoration:none;transform:translateY(-3px);border-color:var(--line2)}
+.lmotto{font-size:12px;color:var(--fg3);line-height:1.5}
+.klink{
+  display:block;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+  background:var(--bg2);color:var(--fg2);font-size:13.5px;
+}
+.klink:hover{text-decoration:none;border-color:var(--line2);color:var(--fg)}
+html[data-theme="light"] .pill.l{color:#2f5c96;border-color:#c5d7ee;background:#eef4fb}
 
 /* ─────────── 通用卡（对局内 / BP / 文档） ─────────── */
 .row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}

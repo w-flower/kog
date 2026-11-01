@@ -29,7 +29,7 @@ KB = ROOT / "20_kb"
 RAW = ROOT / "10_sources" / "raw"
 IDX = ROOT / "30_index"
 
-HEAD_RE = re.compile(r"^###\s+(K-([ABCD])\d{2,3})\s+(.+?)\s*$")
+HEAD_RE = re.compile(r"^###\s+(K-([ABCDL])\d{2,3})\s+(.+?)\s*$")
 SEC_RE = re.compile(r"^#{2,3}\s+")
 TS_RE = re.compile(r"(\d{1,2}):(\d{2})")
 BV_RE = re.compile(r"BV[0-9A-Za-z]{10}")

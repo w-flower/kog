@@ -36,9 +36,19 @@ CAT_META = [
     ("B", "克制关系", "B_克制关系", "打谁舒服、被谁克、为什么"),
     ("C", "BP", "C_BP", "选人阶段该怎么定"),
     ("D", "对局内", "D_对局内", "现在这一刻该干什么"),
+    ("L", "分路", "L_分路", "这个位置该按什么顺序想事"),
 ]
 
-ENTRY_RE = re.compile(r"^###\s+(K-([ABCD])\d{2,3})\s+(.+?)\s*$")
+# 分路：key / 显示名 / 文件 / 图标首字 / 一句话定位
+LANES = [
+    ("mid", "中路", "01_中路.md", "中", "清完这波线往哪走"),
+    ("roam", "游走", "02_游走.md", "游", "第一步去哪"),
+    ("adc", "发育路", "03_发育路.md", "射", "这波兵敢不敢吃"),
+    ("solo", "对抗路", "04_对抗路.md", "抗", "压线还是放线"),
+    ("jungle", "打野", "05_打野.md", "野", "该刷还是该抓"),
+]
+
+ENTRY_RE = re.compile(r"^###\s+(K-([ABCDL])\d{2,3})\s+(.+?)\s*$")
 FM_RE = re.compile(r"\A---\s*\n.*?\n---\s*\n", re.S)
 
 
@@ -53,7 +63,7 @@ def inline(s: str) -> str:
     s = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", s)
     s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', s)
     # K-xxx 交叉引用 → 可点跳转
-    s = re.sub(r"(?<![\w-])(K-[ABCD]\d{2,3})(?![\w-])", r'<a class="kref" href="#\1">\1</a>', s)
+    s = re.sub(r"(?<![\w-])(K-[ABCDL]\d{2,3})(?![\w-])", r'<a class="kref" href="#\1">\1</a>', s)
     return s
 
 
@@ -179,8 +189,41 @@ def parse_opp(title: str) -> str:
     return m.group(1) if m else ""
 
 
+LANE_ALIAS = {"中路": "mid", "中": "mid", "mid": "mid",
+              "游走": "roam", "辅助": "roam", "roam": "roam",
+              "发育路": "adc", "射手": "adc", "adc": "adc",
+              "对抗路": "solo", "边路": "solo", "solo": "solo",
+              "打野": "jungle", "jungle": "jungle"}
+
+
+def lanes_in_title(title: str) -> list[str]:
+    """「苏烈（游走／对抗路）」→ ['roam','solo']"""
+    m = re.search(r"[（(]([^）)]+)[）)]", title)
+    if not m:
+        return []
+    out = []
+    for part in re.split(r"[／/、,，]", m.group(1)):
+        k = LANE_ALIAS.get(part.strip())
+        if k and k not in out:
+            out.append(k)
+    return out
+
+
+def fm_field(path: Path, key: str) -> str:
+    """读 front matter 里的单行字段。"""
+    try:
+        head = path.read_text(encoding="utf-8").split("---")[1]
+    except (IndexError, OSError):
+        return ""
+    for ln in head.splitlines():
+        if ln.strip().startswith(key + ":"):
+            return ln.split(":", 1)[1].strip()
+    return ""
+
+
 def collect() -> dict:
     cats = []
+    lane_docs: list[dict] = []
     for key, name, dname, desc in CAT_META:
         d = KB / dname
         if not d.exists():
@@ -197,18 +240,27 @@ def collect() -> dict:
             title, intro, entries = split_doc(f)
             for e in entries:
                 e["sum"] = first_sentence(e["html"])
-            docs.append({"title": title, "file": f.name, "intro": intro,
-                         "entries": entries, "hero": f.stem})
+            doc = {"title": title, "file": f.name, "intro": intro,
+                   "entries": entries, "hero": f.stem, "cat": key,
+                   "fm_title": fm_field(f, "title")}
+            docs.append(doc)
+            if key == "L":
+                lane_docs.append(doc)
         cats.append({"key": key, "name": name, "desc": desc, "about": about, "docs": docs})
 
     # ── 按英雄归拢：A 文档 / B 文档的文件名就是英雄名
     heroes: dict[str, dict] = {}
     general: list[dict] = []
     for c in cats:
+        if c["key"] == "L":
+            continue
         for d in c["docs"]:
             if c["key"] in ("A", "B"):
                 h = heroes.setdefault(d["hero"], {
-                    "name": d["hero"], "hue": hue_of(d["hero"]), "a": [], "b": []})
+                    "name": d["hero"], "hue": hue_of(d["hero"]), "a": [], "b": [],
+                    "lanes": []})
+                if c["key"] == "A":
+                    h["lanes"] = lanes_in_title(d.get("fm_title") or d["title"])
                 slot = "a" if c["key"] == "A" else "b"
                 for e in d["entries"]:
                     if slot == "b":
@@ -240,7 +292,45 @@ def collect() -> dict:
             title, intro, _ = split_doc(p)
             overview.append({"title": title, "file": f, "html": intro})
 
+    # ── 分路层：每条分路挂上「本路英雄」+「相关对局内环节」+「交叉分路」
+    by_file = {d["file"]: d for d in lane_docs}
+    stages = []          # D 类各节的 role，用于双向链接
+    ddir = KB / "D_对局内"
+    if ddir.exists():
+        for f in sorted(ddir.glob("*.md")):
+            if f.name.startswith("_"):
+                continue
+            roles = [LANE_ALIAS.get(x.strip()) for x in
+                     re.split(r"[\[\],、]", fm_field(f, "role").strip("[]"))]
+            roles = [r for r in roles if r]
+            title, _, _ = split_doc(f)
+            stages.append({"file": f.name, "title": title, "roles": roles,
+                           "id": fm_field(f, "id")})
+
+    lane_list = []
+    for key, name, fname, icon, motto in LANES:
+        d = by_file.get(fname)
+        if not d:
+            continue
+        lane_list.append({
+            "key": key, "name": name, "icon": icon, "motto": motto,
+            "file": fname, "title": d["title"], "intro": d["intro"],
+            "entries": d["entries"], "hue": hue_of(name),
+            "heroes": [h["name"] for h in hero_list if key in h["lanes"]],
+            "stages": [s for s in stages if key in s["roles"]],
+            "cross": [n for k, n, *_ in LANES if k != key],
+        })
+    lane_map = {l["key"]: l["name"] for l in lane_list}
+    for h in hero_list:
+        h["lane_names"] = [lane_map.get(k, "") for k in h["lanes"]]
+
+    lane_about = ""
+    lap = KB / "L_分路" / "_说明.md"
+    if lap.exists():
+        _, lane_about, _ = split_doc(lap)
+
     return {"version": VERSION, "heroes": hero_list, "general": general,
+            "lanes": lane_list, "stages": stages, "lane_about": lane_about,
             "cats": [{"key": c["key"], "name": c["name"], "desc": c["desc"],
                       "n": sum(len(d["entries"]) for d in c["docs"])} for c in cats],
             "overview": overview}

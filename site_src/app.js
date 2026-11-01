@@ -24,8 +24,11 @@
   });
   D.general.forEach(g => g.entries.forEach(e =>
     IDX.push({ ...e, owner: g.title, kind: 'doc:' + g.file })));
+  (D.lanes || []).forEach(l => l.entries.forEach(e =>
+    IDX.push({ ...e, owner: l.name, kind: 'lane:' + l.file })));
 
   const heroOf = n => D.heroes.find(h => h.name === n);
+  const laneOf = f => (D.lanes || []).find(l => l.file === f);
   const byId = id => IDX.find(e => e.id === id);
 
   /* ── 条目折叠卡 ── */
@@ -54,9 +57,23 @@
     </a>`;
   }
 
+  /* ── 分路卡 ── */
+  function laneCard(l) {
+    return `<a class="lcard" href="#lane:${encodeURIComponent(l.file)}">
+      <span class="avatar" style="--h:${l.hue}">${esc(l.icon)}</span>
+      <span class="hname">${esc(l.name)}</span>
+      <span class="hmeta">
+        <span class="pill l">${l.entries.length} 条</span>
+        ${l.heroes.length ? `<span class="pill g">${l.heroes.length} 英雄</span>` : ''}
+      </span>
+      <span class="lmotto">${esc(l.motto || '')}</span>
+    </a>`;
+  }
+
   /* ── 首页 ── */
   function renderHome() {
     const heroes = D.heroes.map(heroCard).join('');
+    const lanes = (D.lanes || []).map(laneCard).join('');
     const gen = D.general.filter(g => g.entries.length || g.intro).map(g => {
       const icon = g.key === 'D' ? '⌁' : g.key === 'C' ? '⇄' : '·';
       const n = g.entries.length;
@@ -80,6 +97,11 @@
         <h1>点英雄，看怎么打</h1>
         <p class="lede">每一条结论都能回溯到具体视频与秒数。有判据才写，没把握就留空。</p>
       </div>
+
+      <section class="sec">
+        <div class="sec-h"><h2>按分路看</h2><span>同一时间点，五个位置要做的决定不一样</span></div>
+        <div class="grid lanes">${lanes}</div>
+      </section>
 
       <section class="sec">
         <div class="sec-h"><h2>英雄</h2><span>${D.heroes.length} 个 · 点开看全部</span></div>
@@ -132,10 +154,65 @@
           <div class="hmeta">
             <span class="pill g">${h.n} 条</span>
             ${h.b_n ? `<span class="pill b">对位 ${h.b_n}</span>` : ''}
+            ${(h.lanes || []).map(k => {
+              const l = (D.lanes || []).find(x => x.key === k);
+              return l ? `<a class="pill l" href="#lane:${encodeURIComponent(l.file)}">${esc(l.name)}大局观</a>` : '';
+            }).join('')}
           </div>
         </div>
       </div>
       ${secA}${secB}${inc}
+    `;
+  }
+
+  /* ── 分路页 ── */
+  function renderLane(file) {
+    const l = laneOf(file);
+    if (!l) return renderHome();
+
+    const heroRow = l.heroes.length
+      ? `<div class="grid">${l.heroes.map(n => heroCard(heroOf(n))).filter(Boolean).join('')}</div>`
+      : `<p class="lede">这个分路还没有英雄卡。${l.key === 'adc' || l.key === 'jungle'
+          ? '（这是已知缺口：没有以该位置为第一视角的素材。）' : ''}</p>`;
+
+    const others = (D.lanes || []).filter(x => x.key !== l.key).map(x =>
+      `<a class="klink" href="#lane:${encodeURIComponent(x.file)}">${esc(x.name)} · ${esc(x.motto || '')}</a>`).join('');
+
+    const stages = (l.stages || []).length
+      ? `<div class="row">${l.stages.map(s =>
+          `<a class="gcard" href="#doc:${encodeURIComponent(s.file)}">
+            <span class="gicon">⌁</span>
+            <span class="gtxt"><b>${esc(s.title)}</b><span>对局内 · ${s.id} 节</span></span>
+          </a>`).join('')}</div>`
+      : `<p class="lede">这一路还没有对应的对局内环节。</p>`;
+
+    view.innerHTML = `
+      <a class="back" href="#">← 返回</a>
+      <div class="hhead">
+        <span class="avatar" style="--h:${l.hue}">${esc(l.icon)}</span>
+        <div>
+          <h1>${esc(l.name)}</h1>
+          <div class="hmeta">
+            <span class="pill l">${l.entries.length} 条判断</span>
+            <span class="pill g">只看位置，不看英雄</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="sec"><div class="sec-h"><h2>这一路的大局观</h2></div>
+        <div class="doc">${l.intro || ''}</div></section>
+
+      <section class="sec"><div class="sec-h"><h2>分条判断</h2>
+        <span>${l.entries.length} 条</span></div>
+        ${l.entries.map(e => entryCard(e, false)).join('')}</section>
+
+      <section class="sec"><div class="sec-h"><h2>这个位置的英雄</h2></div>${heroRow}</section>
+
+      <section class="sec"><div class="sec-h"><h2>对应的时间环节</h2></div>${stages}</section>
+
+      <section class="sec"><div class="sec-h"><h2>交叉的分路</h2>
+        <span>同一件事，两边判据要对得上</span></div>
+        <div class="row">${others}</div></section>
     `;
   }
 
@@ -196,11 +273,13 @@
     qEl.value = '';
     if (!h) return renderHome();
     if (h.startsWith('H:')) return renderHero(h.slice(2));
+    if (h.startsWith('lane:')) return renderLane(h.slice(5));
     if (h.startsWith('doc:')) return renderDoc(h.slice(4));
     if (h.startsWith('cat:')) return renderCat(h.slice(4));
     const e = byId(h);
     if (e) {
       if (e.kind.startsWith('H:')) renderHero(e.kind.slice(2));
+      else if (e.kind.startsWith('lane:')) renderLane(e.kind.slice(5));
       else renderDoc(e.kind.slice(4));
       requestAnimationFrame(() => {
         const el = document.getElementById(h);
