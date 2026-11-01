@@ -316,7 +316,7 @@ def collect() -> dict:
                          if h["name"] in x["vs"] and x["name"] != h["name"]]
 
     overview = []
-    for f in ["00_导航.md", "95_信源名单.md", "90_版本变更台账.md"]:
+    for f in ["00_导航.md", "95_信源名单.md", "96_素材缺口.md", "90_版本变更台账.md"]:
         p = KB / f
         if p.exists():
             title, intro, _ = split_doc(p)
