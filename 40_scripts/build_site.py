@@ -28,8 +28,27 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 KB = ROOT / "20_kb"
 SRC = ROOT / "site_src"
+IDX = ROOT / "30_index"
 DEFAULT_OUT = ROOT / "site" / "index.html"
 VERSION = "S45"
+
+
+def official_roster() -> dict[str, dict]:
+    """30_index/roster.json → {英雄名: {main_lane, lanes, type}}（官方名录，s18 生成）
+
+    为什么要它：A 卡标题里的分路只覆盖有卡的那 50 来个英雄，
+    剩下 70 多个在站点上会是"没有分路"，分路页和总表就漏人。官方 roles 字段是全的。
+    """
+    p = IDX / "roster.json"
+    if not p.exists():
+        return {}
+    try:
+        hs = json.loads(p.read_text(encoding="utf-8"))["heroes"]
+    except Exception:
+        return {}
+    return {h["name"]: {"main_lane": h.get("main_lane", ""),
+                        "lanes": h.get("lanes", []),
+                        "type": h.get("type", "")} for h in hs}
 
 CAT_META = [
     ("A", "英雄教学", "A_英雄教学", "这个英雄怎么玩、什么时候强"),
@@ -222,6 +241,14 @@ def fm_field(path: Path, key: str) -> str:
     return ""
 
 
+def fm_names(path: Path, key: str) -> list[str]:
+    """front matter 里的 `beats: [A, B, C]` → ['A','B','C']"""
+    v = fm_field(path, key).strip()
+    if not v or v == "[]":
+        return []
+    return [x.strip() for x in re.split(r"[,、]", v.strip("[]")) if x.strip()]
+
+
 def sections_as_entries(path: Path) -> list[dict]:
     """叙述式文档（没有 K 编号的 A 类英雄卡）→ 按 `## 二级标题` 切成伪条目。
 
@@ -243,6 +270,9 @@ def sections_as_entries(path: Path) -> list[dict]:
         title = body[i][3:].strip()
         # 「0. 大局观定位」已经在英雄页顶部用三栏块展示，不再重复成条目
         if "大局观定位" in title:
+            continue
+        # B 类自动生成卡里的脚手架小节：不是知识点，别当条目
+        if title in ("待补", "实测条目"):
             continue
         html = md_to_html("\n".join(body[i + 1:end]).strip())
         if not html.strip():
@@ -279,7 +309,10 @@ def collect() -> dict:
                    "fm_title": fm_field(f, "title"),
                    # 大局观定位三件套（s14_tempo.py 写入）
                    "tempo": fm_field(f, "tempo"), "job": fm_field(f, "job"),
-                   "motto": fm_field(f, "motto")}
+                   "motto": fm_field(f, "motto"),
+                   # B 类：官方口径的两个方向（s17_write_b.py 写入）
+                   "beats": fm_names(f, "beats") if key == "B" else [],
+                   "loses": fm_names(f, "loses") if key == "B" else []}
             docs.append(doc)
             if key == "L":
                 lane_docs.append(doc)
@@ -295,12 +328,21 @@ def collect() -> dict:
             if c["key"] in ("A", "B"):
                 h = heroes.setdefault(d["hero"], {
                     "name": d["hero"], "hue": hue_of(d["hero"]), "a": [], "b": [],
-                    "lanes": [], "tempo": "", "job": "", "motto": ""})
+                    "lanes": [], "tempo": "", "job": "", "motto": "",
+                    "beats": [], "loses": []})
                 if c["key"] == "A":
                     h["lanes"] = lanes_in_title(d.get("fm_title") or d["title"])
                     h["tempo"] = d.get("tempo") or ""
                     h["job"] = d.get("job") or ""
                     h["motto"] = d.get("motto") or ""
+                else:
+                    # 官方口径的两组对手名（全英雄池都有）
+                    for k in d.get("beats", []):
+                        if k not in h["beats"]:
+                            h["beats"].append(k)
+                    for k in d.get("loses", []):
+                        if k not in h["loses"]:
+                            h["loses"].append(k)
                 slot = "a" if c["key"] == "A" else "b"
                 for e in d["entries"]:
                     if slot == "b":
@@ -312,18 +354,33 @@ def collect() -> dict:
                                 "entries": d["entries"]})
 
     hero_list = []
+    roster = official_roster()
     for h in heroes.values():
-        h["n"] = len(h["a"]) + len(h["b"])
+        # 分路：A 卡标题优先（作者手写过），缺失时退到官方名录
+        off = roster.get(h["name"], {})
+        if not h["lanes"] and off:
+            h["lanes"] = off.get("lanes") or []
+        h["main_lane"] = (h["lanes"][0] if h["lanes"] else off.get("main_lane", ""))
+        h["type"] = off.get("type", "")
+        # 卡上的名字在官方 129 名录里找不到（别称 / 听写误差 / 未上线），要标出来
+        h["unlisted"] = bool(roster) and not off
+        # 只数真正带 K 编号的条目，别把自动生成的"官方口径"块算成一条
+        h["n"] = len(h["a"]) + len([e for e in h["b"] if e.get("id")])
         h["b_n"] = len(h["b"])
-        # 被谁打：从所有 B 条目里反查对手是不是他
+        # 有 K 编号的实测对位（标题形如「对戈娅：…」）
         h["vs"] = sorted({e["opp"] for e in h["b"] if e.get("opp")})
+        h["beats_n"] = len(h["beats"])
+        h["loses_n"] = len(h["loses"])
         hero_list.append(h)
     hero_list.sort(key=lambda x: (-x["n"], x["name"]))
-
-    # 反向索引：这个英雄在谁的 B 条目里被点名
+    # 反向索引：这个英雄在谁的 beats 里出现 / 谁在它的 beats 里
+    beats_of = {h["name"]: set(h["beats"]) for h in hero_list}
     for h in hero_list:
-        h["incoming"] = [x["name"] for x in hero_list
-                         if h["name"] in x["vs"] and x["name"] != h["name"]]
+        h["incoming"] = sorted(n for n, bs in beats_of.items()
+                               if h["name"] in bs and n != h["name"])
+        # 谁克我 = 官方直列 + 别人页面反列，取并集
+        h["loses_all"] = sorted(set(h["loses"]) | set(h["incoming"]))
+        h["loses_n"] = len(h["loses_all"])
 
     overview = []
     for f in ["00_导航.md", "95_信源名单.md", "96_素材缺口.md", "90_版本变更台账.md"]:

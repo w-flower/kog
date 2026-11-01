@@ -61,12 +61,14 @@
   function heroCard(h) {
     const pills = [];
     if (h.a.length) pills.push(`<span class="pill a">怎么玩 ${h.a.length}</span>`);
-    if (h.b.length) pills.push(`<span class="pill b">对位 ${h.b.length}</span>`);
+    // 克制数来自官方口径（全英雄池都有），比"对位条目数"更能反映这张卡有多厚
+    if (h.beats_n) pills.push(`<span class="pill kw">克 ${h.beats_n}</span>`);
+    if (h.loses_n) pills.push(`<span class="pill kl">被克 ${h.loses_n}</span>`);
     if (!pills.length) pills.push('<span class="pill g">待补</span>');
     const plan = planTags(h);
     return `<a class="hcard" href="#H:${encodeURIComponent(h.name)}">
       <span class="avatar" style="--h:${h.hue}">${esc(h.name.slice(0, 1))}</span>
-      <span class="hname">${esc(h.name)}</span>
+      <span class="hname">${esc(h.name)}${h.unlisted ? '<i class="unlisted" title="官方 129 英雄名录里没有这个名字">?</i>' : ''}</span>
       <span class="hmeta">${pills.join('')}</span>
       ${plan ? `<span class="hplan">${plan}</span>` : ''}
     </a>`;
@@ -119,7 +121,9 @@
       </section>
 
       <section class="sec">
-        <div class="sec-h"><h2>英雄</h2><span>${D.heroes.length} 个 · 点开看全部</span></div>
+        <div class="sec-h"><h2>英雄</h2>
+          <span>${D.heroes.length} 个 · 点开看全部 ·
+            <a href="#matrix">对位总表 →</a></span></div>
         <div class="grid">${heroes}</div>
       </section>
 
@@ -160,6 +164,25 @@
            的克制条目里提到了他，点进去看具体打法。</p></section>`
       : '';
 
+    // 克制速览：官方口径的两组名字，点一下就能跳到对方
+    const chip = n => `<a class="oppchip" href="#H:${encodeURIComponent(n)}">${esc(n)}</a>`;
+    const secK = (h.beats.length || (h.loses_all || []).length)
+      ? `<section class="sec"><div class="sec-h"><h2>克制速览</h2>
+           <span>官方口径 L0 · 具体怎么打看下面的卡</span></div>
+         <div class="oppbox">
+           <div class="opprow">
+             <span class="oppk win">我压</span>
+             <span class="oppv">${(h.beats.length ? h.beats.map(chip).join('') : '<i class="dim">官方没列</i>')}</span>
+           </div>
+           <div class="opprow">
+             <span class="oppk lose">压我</span>
+             <span class="oppv">${((h.loses_all || []).length ? h.loses_all.map(chip).join('') : '<i class="dim">官方没列</i>')}</span>
+           </div>
+         </div>
+         <p class="lede"><a href="#matrix">看全部 ${D.heroes.length} 个英雄的对位表 →</a></p>
+         </section>`
+      : '';
+
     const plan = (h.tempo || h.job || h.motto)
       ? `<div class="planbox">
            <div class="pb-cell">
@@ -185,7 +208,9 @@
           <h1>${esc(h.name)}</h1>
           <div class="hmeta">
             <span class="pill g">${h.n} 条</span>
-            ${h.b_n ? `<span class="pill b">对位 ${h.b_n}</span>` : ''}
+            ${h.unlisted ? '<span class="pill w">不在官方名录</span>' : ''}
+            ${h.beats_n ? `<span class="pill kw">克 ${h.beats_n}</span>` : ''}
+            ${h.loses_n ? `<span class="pill kl">被克 ${h.loses_n}</span>` : ''}
             ${planTags(h)}
             ${(h.lanes || []).map(k => {
               const l = (D.lanes || []).find(x => x.key === k);
@@ -195,7 +220,7 @@
         </div>
       </div>
       ${plan}
-      ${secA}${secB}${inc}
+      ${secK}${secA}${secB}${inc}
     `;
   }
 
@@ -301,11 +326,59 @@
         : '<p class="empty">没有命中。换个词试试，比如英雄名或「对线」。</p>'}`;
   }
 
+  /* ── 对位总表：129 个英雄一张表 ── */
+  function renderMatrix() {
+    const LANES = [['solo', '对抗路'], ['jungle', '打野'], ['mid', '中路'],
+                   ['adc', '发育路'], ['roam', '游走']];
+    const chip = (n, cls) => `<a class="oppchip ${cls || ''}" href="#H:${encodeURIComponent(n)}">${esc(n)}</a>`;
+    const rowsOf = list => list.map(h => {
+      const b = h.beats.length ? h.beats.map(n => chip(n, 'win')).join('') : '<i class="dim">—</i>';
+      const l = (h.loses_all || []).length ? h.loses_all.map(n => chip(n, 'lose')).join('') : '<i class="dim">—</i>';
+      return `<div class="mtx-row">
+        <a class="mtx-h" href="#H:${encodeURIComponent(h.name)}">${esc(h.name)}</a>
+        <div class="mtx-cell"><span class="mtx-lab win">他压制的</span>${b}</div>
+        <div class="mtx-cell"><span class="mtx-lab lose">压制他的</span>${l}</div>
+      </div>`;
+    }).join('');
+
+    const head = `<div class="mtx-row mtx-head">
+        <span>英雄</span><span>他压制的</span><span>压制他的</span>
+      </div>`;
+
+    const blocks = LANES.map(([k, cn]) => {
+      const list = D.heroes.filter(h => h.main_lane === k)
+        .sort((a, b) => b.beats_n - a.beats_n || a.name.localeCompare(b.name, 'zh'));
+      if (!list.length) return '';
+      return `<section class="sec">
+        <div class="sec-h"><h2>${cn}</h2><span>${list.length} 个</span></div>
+        <div class="mtx">${head}${rowsOf(list)}</div>
+      </section>`;
+    }).join('');
+
+    const noLane = D.heroes.filter(h => !LANES.some(([k]) => h.main_lane === k));
+    const rest = noLane.length
+      ? `<section class="sec"><div class="sec-h"><h2>分路未定</h2><span>${noLane.length} 个</span></div>
+         <div class="mtx">${head}${rowsOf(noLane)}</div></section>` : '';
+
+    view.innerHTML = `
+      <a class="back" href="#">← 返回</a>
+      <div class="hero-head">
+        <p class="eyebrow">全英雄池</p>
+        <h1>对位总表</h1>
+        <p class="lede">名字全部可点。这一版是<b>官方口径（L0）</b>：
+          官方每个英雄只给两个方向各 2~6 个例子，不是全量配对，也没给成立条件。
+          要「在什么分段、什么出装下成立」，看英雄页里的 K-B 实测条目。</p>
+      </div>
+      ${blocks}${rest}
+    `;
+  }
+
   /* ── 路由 ── */
   function route() {
     const h = decodeURIComponent(location.hash.slice(1));
     qEl.value = '';
     if (!h) return renderHome();
+    if (h === 'matrix') return renderMatrix();
     if (h.startsWith('H:')) return renderHero(h.slice(2));
     if (h.startsWith('lane:')) return renderLane(h.slice(5));
     if (h.startsWith('doc:')) return renderDoc(h.slice(4));

@@ -118,6 +118,15 @@ html[data-theme="light"] .avatar{
 .pill.b{color:#f0a9a0;border-color:#5a2b28;background:#261715}
 .pill.l{color:#9fc4f5;border-color:#2c4560;background:#151f2b}
 .pill.g{color:var(--fg3)}
+.pill.w{color:#e0c98a;border-color:#544223;background:#241f12}
+html[data-theme="light"] .pill.w{background:#fdf6e3;border-color:#e3d4a8;color:#8a6d1f}
+.unlisted{
+  display:inline-block;margin-left:3px;width:14px;height:14px;line-height:13px;
+  text-align:center;font-size:10px;font-style:normal;font-weight:700;
+  border-radius:50%;border:1px solid #544223;background:#241f12;color:#e0c98a;
+  vertical-align:1px;
+}
+html[data-theme="light"] .unlisted{background:#fdf6e3;border-color:#e3d4a8;color:#8a6d1f}
 
 /* 大局观定位：强势期 / 节奏职责 */
 .hplan{display:flex;flex-wrap:wrap;gap:5px;margin-top:-2px}
@@ -134,6 +143,75 @@ html[data-theme="light"] .avatar{
 .pill.j-split{color:#c9a9d8;border-color:#4b2f56;background:#1d1420}
 html[data-theme="light"] .pill[class*="t-"],
 html[data-theme="light"] .pill[class*="j-"]{background:#fff;border-color:var(--line);color:var(--fg2)}
+
+/* 克制：英雄卡上的两枚计数 */
+.pill.kw{color:#f0b9a9;border-color:#5a3328;background:#261a15}
+.pill.kl{color:#a9cdeb;border-color:#28415a;background:#151d26}
+html[data-theme="light"] .pill.kw{background:#fff3ee;border-color:#e5c2b4;color:#9c4a24}
+html[data-theme="light"] .pill.kl{background:#eef5fb;border-color:#b9cfe3;color:#2b5c86}
+
+/* 英雄页的克制速览 */
+.oppbox{
+  display:grid;gap:1px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--line);overflow:hidden;margin:12px 0 6px;
+}
+.opprow{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:start;
+  padding:11px 14px;background:var(--bg2)}
+.oppk{
+  font-size:11.5px;letter-spacing:.05em;padding:2px 0;font-weight:600;white-space:nowrap;
+}
+.oppk.win{color:#f0a9a0}
+.oppk.lose{color:#9fc4f5}
+html[data-theme="light"] .oppk.win{color:#a8412c}
+html[data-theme="light"] .oppk.lose{color:#2b5c86}
+.oppv{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.oppchip{
+  font-size:12.5px;padding:2px 9px;border-radius:7px;
+  border:1px solid var(--line);background:var(--bg3);color:var(--fg2);
+  text-decoration:none;line-height:1.6;white-space:nowrap;
+}
+.oppchip:hover{background:var(--bg2);color:var(--fg);border-color:var(--fg3)}
+.oppchip.win{border-color:#5a3328}
+.oppchip.lose{border-color:#28415a}
+html[data-theme="light"] .oppchip{background:#fff}
+html[data-theme="light"] .oppchip:hover{background:#f4f6f9}
+.dim{color:var(--fg3);font-style:normal;font-size:12.5px}
+
+/* 对位总表 */
+.mtx{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--bg2)}
+.mtx-row{
+  display:grid;grid-template-columns:104px 1fr 1fr;gap:0;
+  border-top:1px solid var(--line);
+}
+.mtx-row:first-child{border-top:0}
+.mtx-row > *{padding:9px 12px;min-width:0}
+.mtx-row > * + *{border-left:1px solid var(--line)}
+.mtx-head{
+  background:var(--bg3);font-size:11.5px;color:var(--fg3);
+  letter-spacing:.03em;font-weight:600;
+}
+.mtx-head > *{padding-top:7px;padding-bottom:7px}
+.mtx-h{
+  font-weight:600;font-size:13.5px;color:var(--fg);text-decoration:none;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.mtx-h:hover{color:var(--fg2);text-decoration:underline}
+.mtx-cell{display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start}
+.mtx-cell .oppchip{font-size:12px;padding:1px 7px;margin:0}
+.mtx-lab{display:none}
+@media (max-width:640px){
+  .mtx-row{grid-template-columns:1fr;gap:0}
+  .mtx-row > * + *{border-left:0;border-top:1px dashed var(--line)}
+  .mtx-head{display:none}
+  .mtx-h{font-size:14px;background:var(--bg3)}
+  /* 手机上一栏一栏堆叠，必须标出这栏是哪个方向 */
+  .mtx-lab{
+    display:block;width:100%;font-size:10.5px;letter-spacing:.05em;
+    color:var(--fg3);margin-bottom:2px;
+  }
+  .mtx-lab.win{color:#d98d7c}
+  .mtx-lab.lose{color:#7ba6cf}
+}
 
 /* 英雄页顶部的大局观三栏 */
 .planbox{
