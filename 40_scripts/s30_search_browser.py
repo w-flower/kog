@@ -55,8 +55,14 @@ def make_browser_search(pg):
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--hero", nargs="+", required=True)
+    ap.add_argument("--hero", nargs="*", default=[])
+    ap.add_argument("--from-file", type=Path)
     args = ap.parse_args()
+    heroes = args.hero
+    if args.from_file:
+        heroes += args.from_file.read_text(encoding="utf-8").split()
+    if not heroes:
+        ap.error("no heroes given")
 
     with sync_playwright() as p:
         ctx = p.chromium.launch_persistent_context(
@@ -71,7 +77,7 @@ def main() -> int:
         print("登录态:", "有" if logged else "无（匿名搜也可能被风控）")
 
         B.search = make_browser_search(pg)
-        for h in args.hero:
+        for h in heroes:
             print(f"\n=== {h} ===")
             rows = S.harvest(h)
             d = OUT / h
