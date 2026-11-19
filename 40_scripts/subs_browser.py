@@ -20,7 +20,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 PROFILE = Path(r"C:/Users/Lenovo/.workbuddy/data/bilibili-video-summary/browser-profile")
-OUT = Path(r"C:/Users/Lenovo/WorkBuddy/kog/10_sources/creators_cache/subs")
+OUT = Path(__file__).resolve().parent.parent / "10_sources/creators_cache/subs"
 OUT.mkdir(parents=True, exist_ok=True)
 
 JS = """

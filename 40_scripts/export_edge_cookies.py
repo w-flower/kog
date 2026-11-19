@@ -17,7 +17,7 @@ sys.path.insert(0, str(BILI))
 from import_360_cookies import _load_key, read_cookies, write_netscape  # noqa: E402
 from config import DATA_DIR  # noqa: E402
 
-STAGE = Path(r"C:/Users/Lenovo/WorkBuddy/kog/60_state/edge_ck")
+STAGE = Path(__file__).resolve().parent.parent / "60_state/edge_ck"
 OUT = Path(DATA_DIR) / "bilibili_cookies.txt"
 
 

@@ -20,7 +20,7 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 SUBS = ROOT / "10_sources" / "creators_cache" / "subs"
 sys.path.insert(0, str(ROOT / "40_scripts"))
 import names as N  # noqa: E402

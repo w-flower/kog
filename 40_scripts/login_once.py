@@ -15,7 +15,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 PROFILE = Path(r"C:/Users/Lenovo/.workbuddy/data/bilibili-video-summary/browser-profile")
-LOG = Path(r"C:/Users/Lenovo/WorkBuddy/kog/50_logs/login_once.log")
+LOG = Path(__file__).resolve().parent.parent / "50_logs/login_once.log"
 
 
 def main() -> int:

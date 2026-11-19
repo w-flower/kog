@@ -47,7 +47,7 @@ A 类已覆盖 53 个英雄，分两档：**完整卡**（多来源、机制+出
 ## 路径地图
 
 ```
-C:\Users\Lenovo\WorkBuddy\kog\
+D:\Projects\kog\
 ├── 00_README.md            ← 你在看的这页
 ├── 10_sources\             素材层（只进不改，可整层删除重建）
 │   ├── raw\<BV>.cues.json  带 from/to 的原始字幕
@@ -84,7 +84,7 @@ C:\Users\Lenovo\WorkBuddy\kog\
 
 ```bash
 PY="C:/Users/Lenovo/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
-cd C:/Users/Lenovo/WorkBuddy/kog/40_scripts
+cd D:/Projects/kog/40_scripts
 
 "$PY" s1_discover.py --since 2026-09-23 --min-play 20000 --kw "王者荣耀 中路 教学"
 "$PY" s2_cues.py --bvid BV1xxx --out-dir "../10_sources/raw"
@@ -140,7 +140,7 @@ cd C:/Users/Lenovo/WorkBuddy/kog/40_scripts
 
 1. **推送上线**：仓库 `w-flower/kog` 还没建（`git ls-remote` 仍是 `Repository not found`）。建好后：
    ```bash
-   cd C:/Users/Lenovo/WorkBuddy/kog
+   cd D:/Projects/kog
    git remote add origin git@github.com:w-flower/kog.git
    git push -u origin main
    ```

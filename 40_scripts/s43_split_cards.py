@@ -16,7 +16,7 @@
 import re, sys
 from pathlib import Path
 
-BASE = Path("C:/Users/Lenovo/WorkBuddy/kog")
+BASE = Path(__file__).resolve().parent.parent
 CARD_DIR = BASE / "20_kb/A_英雄教学"
 FIELDS = ["id", "cat", "title", "tempo", "job", "motto", "version", "status", "updated", "sources"]
 SECTIONS = ["## 0. 大局观定位", "## 1. 机制内核", "## 2.", "## 3.", "## 4.", "## 5.", "## 待补"]

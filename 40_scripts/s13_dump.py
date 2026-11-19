@@ -11,8 +11,8 @@ import json
 import sys
 from pathlib import Path
 
-SUBS = Path(r"C:/Users/Lenovo/WorkBuddy/kog/10_sources/creators_cache/subs")
-OUT = Path(r"C:/Users/Lenovo/WorkBuddy/kog/50_logs/txt")
+SUBS = Path(__file__).resolve().parent.parent / "10_sources/creators_cache/subs"
+OUT = Path(__file__).resolve().parent.parent / "50_logs/txt"
 OUT.mkdir(parents=True, exist_ok=True)
 
 

@@ -18,7 +18,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 KB = ROOT / "20_kb"
 OUT = ROOT / "50_logs" / "王者荣耀实战知识库_S45_全库合集.md"
 MAX_BYTES = 1024 * 1024          # 1 MiB，超过就停下，别硬传

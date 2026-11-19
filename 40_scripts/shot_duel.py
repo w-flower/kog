@@ -10,8 +10,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
-SITE = Path(r"C:/Users/Lenovo/WorkBuddy/kog/site/index.html").as_uri()
-OUT = Path(r"C:/Users/Lenovo/WorkBuddy/kog/site/_preview")
+SITE = Path(__file__).resolve().parent.parent / "site/index.html".as_uri()
+OUT = Path(__file__).resolve().parent.parent / "site/_preview"
 OUT.mkdir(parents=True, exist_ok=True)
 
 # 需要在页面里点一下才能看到的态：网格视图 / 详情弹层 / 英雄页对位块

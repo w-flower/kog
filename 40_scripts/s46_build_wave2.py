@@ -4,7 +4,7 @@
 """
 from pathlib import Path
 
-BASE = Path("C:/Users/Lenovo/WorkBuddy/kog")
+BASE = Path(__file__).resolve().parent.parent
 T = BASE / "50_logs/transcripts"
 UP = BASE / "50_logs/upload"
 

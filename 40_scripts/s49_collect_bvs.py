@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-BASE = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+BASE = Path(__file__).resolve().parent.parent
 HEROES = ["李信", "猪八戒", "武则天", "桑启", "孙膑", "元歌", "甄姬", "司马懿", "芈月", "亚瑟"]
 bvs = []
 for h in HEROES:

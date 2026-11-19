@@ -30,7 +30,7 @@ from pathlib import Path
 
 import bili_api as B
 
-OUT = Path(r"C:/Users/Lenovo/WorkBuddy/kog/10_sources")
+OUT = Path(__file__).resolve().parent.parent / "10_sources"
 CACHE = OUT / "creators_cache"
 CACHE.mkdir(parents=True, exist_ok=True)
 

@@ -25,7 +25,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "40_scripts"))
 import bili_api as B  # noqa: E402
 

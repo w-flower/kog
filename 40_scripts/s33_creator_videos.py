@@ -27,7 +27,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "10_sources" / "creators_cache"
 HEROES = ROOT / "10_sources" / "heroes"
 CACHE.mkdir(parents=True, exist_ok=True)

@@ -10,7 +10,7 @@ from __future__ import annotations
 import json, sys, time
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "10_sources" / "creators_cache"
 SCORED = ROOT / "10_sources" / "creators_scored.json"
 MANIFEST = CACHE / "mengchenxi_all.json"

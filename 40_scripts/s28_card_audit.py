@@ -19,7 +19,7 @@ import json
 import re
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 DIR = ROOT / "20_kb" / "A_英雄教学"
 
 # 通用思路词：任何英雄都成立的句子特征。命中 ≥2 个才算通用句（防误伤）。

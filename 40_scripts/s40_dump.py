@@ -13,7 +13,7 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path("C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 MP = json.loads((ROOT / "10_sources/creators_cache/hero_batch_map.json").read_text(encoding="utf-8"))
 SUB = ROOT / "10_sources/creators_cache/subs"
 OUT = ROOT / "50_logs/transcripts"

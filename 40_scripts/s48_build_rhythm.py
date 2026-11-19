@@ -7,7 +7,7 @@
 """
 from pathlib import Path
 
-BASE = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+BASE = Path(__file__).resolve().parent.parent
 TRANS = BASE / "50_logs/transcripts/BV1nMLQ6XE7j_王者底层逻辑_整局节奏.txt"
 OUT = BASE / "50_logs/upload/sys_D11.md"
 

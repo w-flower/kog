@@ -16,7 +16,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 HEROES_DIR = ROOT / "10_sources" / "heroes"
 SUBS = ROOT / "10_sources" / "creators_cache" / "subs"
 OUT = ROOT / "10_sources" / "creators_cache" / "hero_batch.json"

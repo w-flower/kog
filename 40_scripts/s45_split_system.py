@@ -16,7 +16,7 @@
 import re, sys
 from pathlib import Path
 
-BASE = Path("C:/Users/Lenovo/WorkBuddy/kog")
+BASE = Path(__file__).resolve().parent.parent
 DST = BASE / "20_kb/D_对局内"
 FIELDS = ["id", "cat", "title", "depends_on", "unlocks", "role", "version", "status", "updated", "sources"]
 KFIELDS = ["适用版本", "触发条件", "判断依据", "决策分支", "反例", "来源", "可信度", "状态"]

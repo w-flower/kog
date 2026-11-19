@@ -16,7 +16,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "10_sources"
 
 ADC = re.compile(r"射手|发育路|公孙离|马可波罗|孙尚香|虞姬|狄仁杰|伽罗|鲁班七号|"

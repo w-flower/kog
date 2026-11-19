@@ -20,7 +20,7 @@ import re
 import sys
 from pathlib import Path
 
-KB = Path(r"C:/Users/Lenovo/WorkBuddy/kog/20_kb/B_克制关系")
+KB = Path(__file__).resolve().parent.parent / "20_kb/B_克制关系"
 PLACEHOLDER = "_还没有。要补的是：这套克制在什么分段、什么出装下成立，以及**具体怎么打**。_"
 
 # ── 人工筛过的条目 ─────────────────────────────────────────────

@@ -10,7 +10,7 @@ import json
 import re
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 H = ROOT / "10_sources/heroes"
 SUBS = ROOT / "10_sources/creators_cache/subs"
 

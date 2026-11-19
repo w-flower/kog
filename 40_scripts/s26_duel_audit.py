@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import names  # noqa: E402
 import s24_duel_grid as G  # noqa: E402
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 IDX = ROOT / "30_index"
 DUEL = IDX / "duel"
 SUBS = ROOT / "10_sources" / "creators_cache" / "subs"

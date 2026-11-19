@@ -26,7 +26,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 IDX = ROOT / "30_index"
 OFF = ROOT / "10_sources" / "official"
 KB = ROOT / "20_kb"

@@ -8,7 +8,7 @@ import json
 import re
 from pathlib import Path
 
-BASE = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+BASE = Path(__file__).resolve().parent.parent
 SUB = BASE / "10_sources/creators_cache/subs"
 UP = BASE / "50_logs/upload"
 

@@ -23,7 +23,7 @@ from pathlib import Path
 
 import bili_api as B
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "10_sources"
 OUT.mkdir(parents=True, exist_ok=True)
 

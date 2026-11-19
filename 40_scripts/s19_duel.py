@@ -24,7 +24,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 SUBS = ROOT / "10_sources" / "creators_cache" / "subs"
 IDX = ROOT / "30_index"
 LOGS = ROOT / "50_logs"

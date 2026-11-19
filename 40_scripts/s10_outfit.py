@@ -15,7 +15,7 @@ from pathlib import Path
 
 import bili_api as B
 
-H = Path(r"C:/Users/Lenovo/WorkBuddy/kog/10_sources/heroes")
+H = Path(__file__).resolve().parent.parent / "10_sources/heroes"
 HEROES = ["不知火舞", "小乔", "大乔", "夏洛特", "盾山", "鲁班大师", "苏烈", "女娲"]
 
 RUNES = ["梦魇", "圣人", "怜悯", "贪婪", "心眼", "献祭", "狩猎", "隐匿", "夺萃",

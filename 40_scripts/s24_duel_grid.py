@@ -37,7 +37,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import names  # noqa: E402
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 IDX = ROOT / "30_index"
 DUEL = IDX / "duel"
 KB = ROOT / "20_kb" / "B_克制关系"

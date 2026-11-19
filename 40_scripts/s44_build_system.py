@@ -2,7 +2,7 @@
 """s44_build_system.py — 装配 D 类系统卡（对局内）的码道任务包。"""
 from pathlib import Path
 
-BASE = Path("C:/Users/Lenovo/WorkBuddy/kog")
+BASE = Path(__file__).resolve().parent.parent
 T = BASE / "50_logs/transcripts"
 UP = BASE / "50_logs/upload"
 

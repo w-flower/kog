@@ -22,7 +22,7 @@ from pathlib import Path
 
 import bili_api as B
 
-OUT = Path(r"C:/Users/Lenovo/WorkBuddy/kog/10_sources/lanes")
+OUT = Path(__file__).resolve().parent.parent / "10_sources/lanes"
 
 LANES = {
     "adc": ["射手 全局 思路", "发育路 教学 细节", "射手 发育 教学", "射手 站位 输出"],

@@ -23,7 +23,7 @@ import json
 import re
 from pathlib import Path
 
-IDX = Path(r"C:/Users/Lenovo/WorkBuddy/kog/30_index")
+IDX = Path(__file__).resolve().parent.parent / "30_index"
 
 # 口语 / 错别字 / 简称 → 官方名。
 # 目标名不在官方名录里的会被 _prune() 剔掉，所以这里可以放心写。

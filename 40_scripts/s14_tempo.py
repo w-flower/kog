@@ -21,7 +21,7 @@ import argparse
 import re
 from pathlib import Path
 
-KB = Path(r"C:/Users/Lenovo/WorkBuddy/kog/20_kb/A_英雄教学")
+KB = Path(__file__).resolve().parent.parent / "20_kb/A_英雄教学"
 
 TEMPO_CN = {"early": "前期", "mid": "中期", "late": "后期", "even": "全期"}
 JOB_CN = {"open": "开节奏", "follow": "跟节奏", "hold": "守节奏",

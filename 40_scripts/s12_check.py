@@ -21,7 +21,7 @@ import json
 import re
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 SUBS = ROOT / "10_sources" / "creators_cache" / "subs"
 LANES = ROOT / "10_sources" / "lanes"
 

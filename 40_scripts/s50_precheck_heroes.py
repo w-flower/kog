@@ -9,10 +9,10 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, r"C:/Users/Lenovo/WorkBuddy/kog/40_scripts")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from s47_precheck_subs import check
 
-BASE = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+BASE = Path(__file__).resolve().parent.parent
 HEROES = ["李信", "猪八戒", "武则天", "桑启", "孙膑", "元歌", "甄姬", "司马懿", "芈月", "亚瑟"]
 
 ok_all = {}

@@ -14,7 +14,7 @@
 import json, re, sys
 from pathlib import Path
 
-BASE = Path("C:/Users/Lenovo/WorkBuddy/kog")
+BASE = Path(__file__).resolve().parent.parent
 SD = BASE / "10_sources/creators_cache/subs"
 KOG = set("技能 兵线 野区 打野 大招 一技能 二技能 三技能 装备 经济 团战 射手 法师 辅助 对抗路 发育路 中路 升级 冷却 血条 防御塔 峡谷 英雄 王者荣耀 buff 铭文 出门装 回城 闪现 主宰 暴君 高地".split())
 

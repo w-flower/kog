@@ -19,7 +19,7 @@ import json
 import re
 from pathlib import Path
 
-ROOT = Path(r"C:/Users/Lenovo/WorkBuddy/kog")
+ROOT = Path(__file__).resolve().parent.parent
 A_DIR = ROOT / "20_kb" / "A_英雄教学"
 B_DIR = ROOT / "20_kb" / "B_克制关系"
 ROSTER = ROOT / "30_index" / "roster.json"
