@@ -1,6 +1,0 @@
-dshgo: 端口 3081 被占用，改用 3082
-dshgo: 局域网地址 http://26.112.147.60:3082  http://192.168.43.170:3082  （上游 127.0.0.1:53991）
-dshgo: 自描述端点 /__dshgo__/info（客户端可据此自动发现地址）
-dshgo: 尚未设置访问密码，转发端口对所有同网络设备开放（设置里可开启）
-dshgo: 解锁端点 /__dshgo__/unlock（浏览器发密码 / App 发 JSON）
-dsh web: http://127.0.0.1:53991/?token=j-dt1Q0MOCqo_3S99J81hEleG9BHGqgPe8JCzGkpkCM
