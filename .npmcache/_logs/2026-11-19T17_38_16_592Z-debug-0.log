@@ -1,0 +1,38 @@
+0 verbose cli D:\app\CodeArts\resources\bin\runtimes\node\node.exe D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.9.8
+2 info using node@v22.23.2
+3 silly config load:file:D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\npmrc
+4 silly config load:file:D:\Projects\kog\.npmrc
+5 silly config load:file:C:\Users\Lenovo\.npmrc
+6 silly config load:file:C:\Users\Lenovo\.codearts\runtimes\node-global\etc\npmrc
+7 verbose title npm view dshgo version description
+8 verbose argv "view" "dshgo" "version" "description" "--json"
+9 verbose logfile logs-max:10 dir:D:\Projects\kog\.npmcache\_logs\2026-11-19T17_38_16_592Z-
+10 verbose logfile D:\Projects\kog\.npmcache\_logs\2026-11-19T17_38_16_592Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET 404 https://registry.npmjs.org/dshgo 2444ms (cache skip)
+13 verbose stack HttpErrorGeneral: 404 Not Found - GET https://registry.npmjs.org/dshgo - Not found
+13 verbose stack     at D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\node_modules\npm-registry-fetch\lib\check-response.js:103:15
+13 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+13 verbose stack     at async RegistryFetcher.packument (D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\node_modules\pacote\lib\registry.js:90:19)
+13 verbose stack     at async #getData (D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\lib\commands\view.js:135:20)
+13 verbose stack     at async #viewPackage (D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\lib\commands\view.js:112:28)
+13 verbose stack     at async View.exec (D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\lib\commands\view.js:70:5)
+13 verbose stack     at async Npm.exec (D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\lib\npm.js:207:9)
+13 verbose stack     at async module.exports (D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\lib\cli\entry.js:74:5)
+14 verbose statusCode 404
+15 verbose pkgid dshgo@*
+16 error code E404
+17 error 404 Not Found - GET https://registry.npmjs.org/dshgo - Not found
+18 error 404
+19 error 404  'dshgo@*' is not in this registry.
+20 error 404
+21 error 404 Note that you can also install from a
+22 error 404 tarball, folder, http url, or git url.
+23 verbose cwd D:\Projects\kog
+24 verbose os Windows_NT 10.0.26200
+25 verbose node v22.23.2
+26 verbose npm  v10.9.8
+27 verbose exit 1
+28 verbose code 1
+29 error A complete log of this run can be found in: D:\Projects\kog\.npmcache\_logs\2026-11-19T17_38_16_592Z-debug-0.log

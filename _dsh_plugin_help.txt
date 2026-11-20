@@ -1,0 +1,13 @@
+﻿Usage: dsh plugin [options] [args...]
+
+manage a profile's plugins by forwarding the remaining arguments to pnpm in the
+profile directory
+
+Arguments:
+  args              pnpm arguments, forwarded verbatim (add <pkg>, remove <pkg>,
+                    why <pkg>, ...)
+
+Options:
+  --profile <name>  the profile whose plugins to manage (initialized on first
+                    use)
+  -h, --help        show this help

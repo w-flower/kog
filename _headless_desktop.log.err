@@ -1,0 +1,22 @@
+dsh: warning: 1 entry did not activate
+dshgo (@xiazhi88/dshgo): failed to import: Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@xiazhi88/dshgo' imported from C:\Users\Lenovo\.dsh\profiles\web\
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:331:9)
+    at packageResolve (node:internal/modules/esm/resolve:797:25)
+    at moduleResolve (node:internal/modules/esm/resolve:886:18)
+    at defaultResolve (node:internal/modules/esm/resolve:1019:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:705:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:725:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:763:56)
+    at file:///D:/app/DeepseekHarness/resources/app.asar/dsh/node_modules/@deepseek-ai/dsh-app-boot/lib/index.js:2715:77
+    at adapted (file:///D:/app/DeepseekHarness/resources/app.asar/dsh/node_modules/@deepseek-ai/dsh-app-boot/lib/index.js:2680:15)
+    at file:///D:/app/DeepseekHarness/resources/app.asar/dsh/node_modules/@deepseek-ai/dsh-app-boot/lib/index.js:2705:19
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)
+[llm-deepseek-account] model listing from https://api.deepseek.com/models loaded 2 model(s), skipped 0 row(s)

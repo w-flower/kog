@@ -1,0 +1,23 @@
+0 verbose cli D:\app\CodeArts\resources\bin\runtimes\node\node.exe D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.9.8
+2 info using node@v22.23.2
+3 silly config load:file:D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\npmrc
+4 warn invalid config cache=false set in command line options
+5 warn invalid config Must be valid filesystem path
+6 silly config load:file:D:\Projects\kog\.npmrc
+7 silly config load:file:C:\Users\Lenovo\.npmrc
+8 silly config load:file:C:\Users\Lenovo\.codearts\runtimes\node-global\etc\npmrc
+9 verbose title npm search dsh-go remote
+10 verbose argv "search" "dsh-go remote" "--registry" "https://registry.npmmirror.com" "--no-cache"
+11 verbose logfile logs-max:10 dir:D:\Projects\kog\.npmcache\_logs\2026-11-19T17_38_22_020Z-
+12 verbose logfile D:\Projects\kog\.npmcache\_logs\2026-11-19T17_38_22_020Z-debug-0.log
+13 silly logfile done cleaning log files
+14 silly search searching packages
+15 http fetch GET 200 https://registry.npmmirror.com/-/v1/search?text=dsh-go+remote&size=20&from=0&quality=0.65&popularity=0.98&maintenance=0.5 341ms (cache miss)
+16 silly search search completed
+17 verbose cwd D:\Projects\kog
+18 verbose os Windows_NT 10.0.26200
+19 verbose node v22.23.2
+20 verbose npm  v10.9.8
+21 verbose exit 0
+22 info ok

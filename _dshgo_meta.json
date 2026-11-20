@@ -1,0 +1,116 @@
+﻿{
+  "_id": "@xiazhi88/dshgo@2.0.5",
+  "_rev": "6159683-6aaa6957a1fe2f0a7826852a",
+  "dist-tags": {
+    "latest": "2.0.5"
+  },
+  "name": "@xiazhi88/dshgo",
+  "time": {
+    "created": "2026-09-16T10:03:03.761Z",
+    "modified": "2026-09-18T16:09:21.526Z",
+    "2.0.2": "2026-09-16T10:02:46.735Z",
+    "2.0.3": "2026-09-16T10:07:22.775Z",
+    "2.0.4": "2026-09-16T11:58:04.769Z",
+    "2.0.5": "2026-09-18T16:09:08.855Z"
+  },
+  "versions": [
+    "2.0.2",
+    "2.0.3",
+    "2.0.4",
+    "2.0.5"
+  ],
+  "author": "xiazhi88",
+  "bugs": {
+    "url": "https://github.com/xiazhi88/dshgo/issues"
+  },
+  "description": "把只监听 127.0.0.1 的 dsh web 暴露到局域网，并带上移动端适配 —— 一个包，手机连上就能用。",
+  "homepage": "https://github.com/xiazhi88/dshgo#readme",
+  "keywords": [
+    "dsh-plugin",
+    "dsh",
+    "deepseek-harness",
+    "deepseek",
+    "mobile",
+    "lan",
+    "proxy"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    "xiazhi88 <qixo3469@hotmail.com>"
+  ],
+  "repository": {
+    "url": "git+https://github.com/xiazhi88/dshgo.git",
+    "type": "git"
+  },
+  "_source_registry_name": "default",
+  "_contentLength": 22819,
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots"
+      ],
+      "platform": "web"
+    }
+  },
+  "dist": {
+    "shasum": "f40f06de1ae572550aa683dbf854d80392c7aa5c",
+    "tarball": "https://registry.npmmirror.com/@xiazhi88/dshgo/-/dshgo-2.0.5.tgz",
+    "fileCount": 17,
+    "integrity": "sha512-SaCWAZGgU9E9lF9sWnmVfSRQrHWK+o5fMoQVumFbYTMlvNeaQBhSkMkH7bP/ZetteEOJIig0nU1xXXn6PLIQvQ==",
+    "signatures": [
+      {
+        "sig": "MEUCIEp3ptS1CViwAwpSbYw7QXjbtS3xHGgXMD/WBZa7ewOuAiEA/cPc7XlgGZW2koqtzbzx24aPqSkY5Gkz1XTkCtmB6FI=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      },
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEYCIQDvYw9+kT+yJOmpSld7HVM1x4Zhx7oHU1DVO9hD21ayiQIhAP8plEY3ptCtzoAMCXjyAULndOyRtWr0WAgSy/CktjBO"
+      }
+    ],
+    "unpackedSize": 732814,
+    "size": 220309
+  },
+  "main": "lib/index.js",
+  "type": "module",
+  "dshgo": {
+    "appApk": "https://cdn.jsdelivr.net/gh/xiazhi88/dshgo@dist-v4.4.3/dshgo-app.apk",
+    "appVersion": "4.4.3",
+    "appApkFallback": "https://github.com/xiazhi88/dshgo/releases/latest/download/dshgo-app.apk"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./client/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "gitHead": "6ba8227c803cc0e81b75531a4117d3143e1f7cff",
+  "version": "2.0.5",
+  "_npmUser": "xiazhi88 <qixo3469@hotmail.com>",
+  "_npmVersion": "10.9.7",
+  "directories": {},
+  "_nodeVersion": "22.22.2",
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "@deepseek-ai/schemastery": "^3.18.2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "_hasShrinkwrap": false,
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/dshgo_2.0.5_1789747748729_0.8398804583057757"
+  },
+  "_cnpmcore_publish_time": "2026-09-18T16:09:08.855Z",
+  "publish_time": 1789747748855
+}

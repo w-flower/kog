@@ -1,0 +1,19 @@
+0 verbose cli D:\app\CodeArts\resources\bin\runtimes\node\node.exe D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.9.8
+2 info using node@v22.23.2
+3 silly config load:file:D:\app\CodeArts\resources\bin\runtimes\node\node_modules\npm\npmrc
+4 silly config load:file:D:\Projects\kog\.npmrc
+5 silly config load:file:C:\Users\Lenovo\.npmrc
+6 silly config load:file:C:\Users\Lenovo\.codearts\runtimes\node-global\etc\npmrc
+7 verbose title npm view @xiazhi88/dshgo version description repository.url homepage dist.tarball
+8 verbose argv "view" "@xiazhi88/dshgo" "version" "description" "repository.url" "homepage" "dist.tarball" "--json"
+9 verbose logfile logs-max:10 dir:D:\Projects\kog\.npmcache\_logs\2026-11-19T17_37_51_754Z-
+10 verbose logfile D:\Projects\kog\.npmcache\_logs\2026-11-19T17_37_51_754Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET 200 https://registry.npmmirror.com/@xiazhi88%2fdshgo 186ms (cache miss)
+13 verbose cwd D:\Projects\kog
+14 verbose os Windows_NT 10.0.26200
+15 verbose node v22.23.2
+16 verbose npm  v10.9.8
+17 verbose exit 0
+18 info ok
