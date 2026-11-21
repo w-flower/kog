@@ -47,7 +47,7 @@ D:\Projects\kog\
 │   ├── 95_信源名单.md    ★权威 UP 名册（§十是当前唯一可信的评级）
 │   └── 96_素材缺口.md    ★素材缺口台账（幽灵字幕/串源/重采记录都在这）
 ├── 30_index\index.jsonl  检索索引（s5_index 生成，717 行）
-├── 40_scripts\           59 个脚本，全部 `s<数字>_<用途>.py` 命名
+├── 40_scripts\           63 个脚本，全部 `s<数字>_<用途>.py` 命名
 ├── 50_logs\              日志 / 转录 / 摘要 / 码道输入包与产物
 │   ├── transcripts\      带 [MM:SS] 的纯文本转录
 │   ├── digest\           教学高信号摘要
@@ -77,6 +77,22 @@ D:\Projects\kog\
 ```
 
 **关键：创作一律交码道（CodeArts），本地只做搜索、取字幕、预检、装配、收件、落盘、断言。** 这是用户定的硬规则，别在本地写卡。
+
+### ③ 的特殊情况：视频根本没有字幕怎么办
+
+B 站 AI 字幕只在**登录态**下暴露，且有些视频**只给 ai-en / ai-ja 机器翻译轨，没有 ai-zh**。这时候走本地 ASR：
+
+```bash
+# 1) 下音频（本机已装 ffmpeg + yt-dlp）
+yt-dlp -f bestaudio -x --audio-format wav --postprocessor-args "-ar 16000 -ac 1" -o audio.%(ext)s "https://www.bilibili.com/video/<BV>"
+# 2) 转写（medium 精度够用，10 分钟音频约 14 分钟）
+python 40_scripts/s52_transcribe.py audio.wav out.txt 60_state/models/faster-whisper-medium zh prompt_domain.py
+# 3) 转写有繁简混杂 + 专有名词错，要过一遍人工校订，再生成 cues 让索引可校验
+python 40_scripts/s55_asr_to_cues.py out_clean.txt 10_sources/raw/<BV>.cues.json <时长秒>
+```
+
+- 第五个参数传 `.py` 文件时取其中 `PROMPT` 变量——**把本视频涉及的英雄名和术语塞进去，专有名词准确率明显提升**，这一步别省。
+- small 模型够快但专有名词错得多（嫦娥→"长额"、河道视野→"核到视野"），medium 明显更好。
 
 ---
 
@@ -136,6 +152,12 @@ sources: [BV1xxxxxxxxx]
 11. **bash 里给 `python -c` 传中文/反引号会出事**：反引号被当命令替换。写临时 `.py` 文件再跑，或用 `<<'EOF'`。
 12. **PowerShell 的 stdout 不回显**：要拿输出就写文件再读。
 13. **2026-11-19 迁移事故**：批量替换 `Path(r"...")` 时漏了收尾括号，产生 21 个语法错误文件。教训——**路径替换后必须逐个 `py_compile` 检查**，别只看 grep 残留为 0。
+14. **码道登录态"假有效"**：`auth.huaweicloud.com` 打开能直接进控制台（华为云 SSO 是好的），但 `devcloud.../chat/home` 仍显示「登录华为云」。**必须 goto 带 service 的完整 URL**：`https://auth.huaweicloud.com/authui/login.html?service=<encodeURIComponent("https://devcloud.cn-north-4.huaweicloud.com/chat/home")>`，等 9 秒会自己跳回来并已登录。直接点页面上那个「登录华为云」按钮**没有任何反应**。
+15. **ego 的 task space 是进程级的**：`taskSpace(name)` 建的空间，nodejs 进程一结束就销毁，下个进程去 `taskSpace(1)` 会报 `task space not found`。所以**派发 + 轮询 + 取件必须在同一个进程里跑完**。`dispatch_wait*.mjs` 就是为此写的。
+16. **多附件容易上传失败**：两个附件曾卡在「上传失败，请重试」41 分钟。**合并成单附件**（规范+素材+任务塞进一个 md）+ 上传后检测 `上传失败` 文本 + 重试 3 次，成功率明显高。
+17. **bash 重定向会吞 ego 的输出**：`ego-browser nodejs -e ... > log 2>&1` 是块缓冲，一个多小时看不到一行。要在脚本内部用 `fs.appendFileSync` 写日志。
+18. **ASR 的 `unverified`**：新视频没有 B 站字幕时，索引会把该 BV 的所有条目判为 `unverified`（没有 cues 可校验）。跑一次 `s55_asr_to_cues.py` 补 cues 即可归零。
+19. **`git add -A` 会误带杂物**：11-21 提交时混进了 `dsh-remote-qr.png`。提交前先 `git status` 看一眼。
 
 ---
 
@@ -143,8 +165,9 @@ sources: [BV1xxxxxxxxx]
 
 - A 卡 131 张，审计 0 问题；索引 717 行，坏时间戳 0
 - **其中 90 张仍是薄卡（< 2200 字符）**：苍 / 云缨 / 妲己 / 弈星 / 赵云 / 后羿 / 狂铁 / 蒙恬 / 蒙犽 / 黄忠 / 云中君 / 孙悟空 / 安琪拉 / 沈梦溪 / 米莱狄 / 盘古 / 孙尚香 / 程咬金 / 莱西奥 / 宫本武藏 / 干将莫邪 / 百里玄策 / 海月 / 白起 / 王昭君 / 达摩 / 孙策 / 蔡文姬 / 项羽 / 姜子牙 / 廉颇 / 鲁班七号 / 庄周 / 张良 / 朵莉亚 / 杨玉环 / 鬼谷子 / 金蝉 / 墨子 / 元辅 …
-- 最新一轮（11-19）：10 个串源英雄重采成功，净 24 条真素材，产出 10 张卡（亚瑟 7305 字最厚；李信/猪八戒/甄姬 单素材偏薄）；D11 整局节奏系统卡 20 条 K 条目
-- 最近部署：commit `b502500`（迁移）← `25d2511`（10 卡 + D11）
+- 最新一轮（11-21）：新增 **D12 辅助决策**（25 条 K，K-D111~K-D135），来源 BV1S8sn6zEJq（欺压ya 辅助精讲课 02 期）——该视频无中文 CC 字幕，走本地 faster-whisper medium 转写 + 人工校订。索引 905 行、271 条站点节点、坏时间戳 0、未验证 0
+- 上一轮（11-19）：10 个串源英雄重采成功，净 24 条真素材，产出 10 张卡（亚瑟 7305 字最厚；李信/猪八戒/甄姬 单素材偏薄）；D11 整局节奏系统卡 20 条 K 条目
+- 最近部署：commit `9f75f91`（D12）← `b502500`（迁移）← `25d2511`（10 卡 + D11）
 
 ---
 
@@ -161,6 +184,7 @@ sources: [BV1xxxxxxxxx]
 
 | 日期 | 变更 |
 |---|---|
+| 2026-11-21 | 新增 D12 辅助决策（25 条 K）；打通本地 ASR 通道（s52）+ ASR→cues（s55）；新增 s53/s54 装配脚本 |
 | 2026-11-19 | 从 `C:\Users\Lenovo\WorkBuddy\kog` 迁到 `D:\Projects\kog`；43 个脚本路径改 `__file__` 自动推导；新增本文件 |
 | 2026-11-19 | 10 个串源英雄重采 + 10 张卡落盘；新增 D11 整局节奏；新增 s48~s51 脚本 |
 | 2026-11-18 | 新增 s47 串源预检闸门（拦住 14/17 假素材） |
